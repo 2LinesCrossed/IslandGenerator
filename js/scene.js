@@ -1,5 +1,5 @@
 import * as THREE from './lib/three.js';
-import { Perlin } from './lib/perlin.js';
+import { generateTerrain } from './terrain.js';
 
 var width = window.innerWidth;
 var height = window.innerHeight;
@@ -29,30 +29,14 @@ export function initialiseScene() {
     .normalize();
   scene.add(light);
 
-  //Terrain setup
-  var geometry = new THREE.PlaneBufferGeometry(2000, 2000, 256, 256);
-  var material = new THREE.MeshLambertMaterial({ color: 0x3c3951 });
-
-  var terrain = new THREE.Mesh(geometry, material);
-  terrain.rotation.x = -Math.PI / 2;
-  terrain.geometry.attributes.position.needsUpdate = true;
-  terrain.geometry.computeVertexNormals();
-
+  var terrain = generateTerrain();
   scene.add(terrain);
-
-  //Change the peak value for different sizes.
-  var perlin = new Perlin();
-  var peak = 60;
-
-  var vertices = terrain.geometry.attributes.position.array;
-  for (var i = 0; i <= vertices.length; i += 3) {
-    vertices[i + 2] = peak * Math.random();
-  }
-  terrain.geometry.attributes.position.needsUpdate = true;
-  terrain.geometry.computeVertexNormals();
 
   // Start the update loop
   renderer.setAnimationLoop(update);
+
+  // Add event listeners
+  window.addEventListener('resize', onWindowResize);
 }
 
 function onWindowResize() {
@@ -82,5 +66,3 @@ function update() {
 function render() {
   renderer.render(scene, camera);
 }
-
-window.addEventListener('resize', onWindowResize);
