@@ -61,12 +61,12 @@ function onWindowResize() {
   var height = window.innerHeight;
   //then update the renderer
   renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
   //and update the aspect ratio of the camera
   camera.aspect = width / height;
 
   //update the projection matrix given the new values
   camera.updateProjectionMatrix();
-
   //and finally render the scene again
   renderer.render(scene, camera);
 }
