@@ -7,7 +7,7 @@
     <script src="js/three.js"> </script>
 	
 	<script>
-	const Perlin = require('./perlin.js').Perlin;
+	
 	var width = window.innerWidth;
 	var height = window.innerHeight;
 	
@@ -63,21 +63,25 @@
 	
 	
 	//Change the peak value for different sizes.
-	var perlin = new Perlin();
+	//var perlin = new Perlin();
 	var peak = 60;
-	var smoothing = 300;
-	function refreshVertices(){
-		var vertices = terrain.geometry.attributes.position.array;
-		for (var i = 0; i <= vertices.length; i += 3) {
-			vertices[i+2] = peak * perlin.noise(
+	//var smoothing = 300; //Necessary for the perlin smoothing
+	//function refreshVertices(){
+	var vertices = terrain.geometry.attributes.position.array;
+	for (var i = 0; i <= vertices.length; i += 3) {
+		vertices[i+2] = peak * Math.random();
+			
+			
+			
+			/*vertices[i+2] = peak * perlin.noise(
 				(vertices[i])/smoothing,
-				(vertices[i+1])/smoothing
-			);
-		}			
+				(vertices[i+1])/smoothing 
+			);*/
+	}			
 	
-		terrain.geometry.attributes.position.needsUpdate = true;
-		terrain.geometry.computeVertexNormals();
-	}
+	terrain.geometry.attributes.position.needsUpdate = true;
+	terrain.geometry.computeVertexNormals();
+	//}
 	/*
 	int cols, rows;
 	int scl = 20; 
