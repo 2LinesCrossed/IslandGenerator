@@ -8,7 +8,7 @@ var camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
 var cameraTarget = { x: 0, y: 0, z: 0 };
 camera.position.y = 70;
 camera.position.z = 1000;
-camera.rotation.x = -15 * Math.PI / 180;
+camera.rotation.x = (-15 * Math.PI) / 180;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(0xc3dde5, 100);
@@ -21,24 +21,26 @@ document.body.appendChild(renderer.domElement);
 	document.body.appendChild( stats.dom); */
 
 var light = new THREE.DirectionalLight(0xffffff, 2);
-light.position.set(camera.position.x, camera.position.y + 500, camera.position.z + 500).normalize();
+light.position
+  .set(camera.position.x, camera.position.y + 500, camera.position.z + 500)
+  .normalize();
 scene.add(light);
 
 //this function is called when the window is resized
 var MyResize = function () {
-	//get the new sizes
-	var width = window.innerWidth;
-	var height = window.innerHeight;
-	//then update the renderer
-	renderer.setSize(width, height);
-	//and update the aspect ratio of the camera
-	camera.aspect = width / height;
+  //get the new sizes
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  //then update the renderer
+  renderer.setSize(width, height);
+  //and update the aspect ratio of the camera
+  camera.aspect = width / height;
 
-	//update the projection matrix given the new values
-	camera.updateProjectionMatrix();
+  //update the projection matrix given the new values
+  camera.updateProjectionMatrix();
 
-	//and finally render the scene again
-	renderer.render(scene, camera);
+  //and finally render the scene again
+  renderer.render(scene, camera);
 };
 
 //Terrain setup
@@ -55,9 +57,9 @@ var peak = 60;
 //function refreshVertices(){
 var vertices = terrain.geometry.attributes.position.array;
 for (var i = 0; i <= vertices.length; i += 3) {
-	vertices[i + 2] = peak * Math.random();
+  vertices[i + 2] = peak * Math.random();
 
-	/*vertices[i+2] = peak * perlin.noise(
+  /*vertices[i+2] = peak * perlin.noise(
 				(vertices[i])/smoothing,
 				(vertices[i+1])/smoothing 
 			);*/
@@ -76,13 +78,13 @@ terrain.geometry.computeVertexNormals();
 	} 
 	*/
 function render() {
-	renderer.render(scene, camera);
+  renderer.render(scene, camera);
 }
 function loop() {
-	//update();
-	render();
+  //update();
+  render();
 }
 
 loop();
 
-window.addEventListener('resize', MyResize);
+window.addEventListener("resize", MyResize);
