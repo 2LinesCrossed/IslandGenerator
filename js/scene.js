@@ -87,4 +87,4 @@ function loop() {
 
 loop();
 
-window.addEventListener("resize", MyResize);
+window.addEventListener('resize', MyResize);
