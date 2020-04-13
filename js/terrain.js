@@ -12,10 +12,12 @@ export function generateTerrain() {
   //Change the peak value for different sizes.
   var perlin = new Perlin();
   var peak = 60;
+  var smoothing = 300;
 
   var vertices = terrain.geometry.attributes.position.array;
   for (var i = 0; i <= vertices.length; i += 3) {
-    vertices[i + 2] = peak * Math.random();
+    vertices[i + 2] =
+      peak * perlin.noise(vertices[i] / smoothing, vertices[i + 1] / smoothing);
   }
   terrain.geometry.attributes.position.needsUpdate = true;
   terrain.geometry.computeVertexNormals();
