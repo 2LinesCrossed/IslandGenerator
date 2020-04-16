@@ -1,4 +1,5 @@
 import * as THREE from './lib/three.js';
+import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
 var width = window.innerWidth;
 var height = window.innerHeight;
