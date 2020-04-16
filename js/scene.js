@@ -1,6 +1,6 @@
 import * as THREE from './lib/three.js';
 import { generateTerrain } from './terrain.js';
-
+import * as CONTROLS from './lib/OrbitControls.js';
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -38,6 +38,16 @@ export function initialiseScene() {
   // Add event listeners
   window.addEventListener('resize', onWindowResize);
 }
+//////////////
+// CONTROLS //
+//////////////
+
+// move mouse and: left   click to rotate,
+//                 middle click to zoom,
+//                 right  click to pan
+// add the new control and link to the current camera to transform its position
+
+controls = new CONTROLS.OrbitControls(camera, renderer.domElement);
 
 function onWindowResize() {
   //get the new sizes
@@ -57,6 +67,7 @@ function onWindowResize() {
 
 function update() {
   render();
+
   // Calculate delta time based on time after previous render
   var renderTime = performance.now();
   deltaTime = renderTime - lastRenderTime;
@@ -65,4 +76,5 @@ function update() {
 
 function render() {
   renderer.render(scene, camera);
+  controls.update();
 }
