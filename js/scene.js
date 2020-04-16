@@ -46,7 +46,7 @@ export function initialiseScene() {
 //                 right  click to pan
 // add the new control and link to the current camera to transform its position
 
-controls = new CONTROLS.OrbitControls(camera, renderer.domElement);
+var controls = new OrbitControls(camera, renderer.domElement);
 
 function onWindowResize() {
   //get the new sizes
