@@ -1,6 +1,6 @@
 import * as THREE from './lib/three.js';
 import { generateTerrain } from './terrain.js';
-import * as CONTROLS from './lib/OrbitControls.js';
+import { OrbitControls } from './lib/orbitControls.js';
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -47,7 +47,7 @@ export function initialiseScene() {
 //                 right  click to pan
 // add the new control and link to the current camera to transform its position
 
-controls = new CONTROLS.OrbitControls(camera, renderer.domElement);
+var controls = new OrbitControls(camera, renderer.domElement);
 
 function onWindowResize() {
   //get the new sizes
