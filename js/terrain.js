@@ -12,12 +12,23 @@ export function generateTerrain() {
   //Change the peak value for different sizes.
   var perlin = new Perlin();
   var peak = 60;
+  var smoothing = 300;
 
   var vertices = terrain.geometry.attributes.position.array;
   for (var i = 0; i <= vertices.length; i += 3) {
-    vertices[i + 2] = peak * Math.random();
+    vertices[i + 2] =
+      peak * perlin.noise(vertices[i] / smoothing, vertices[i + 1] / smoothing);
   }
   terrain.geometry.attributes.position.needsUpdate = true;
   terrain.geometry.computeVertexNormals();
   return terrain;
 }
+
+//Reverse engineer that one https://www.openprocessing.org/sketch/816746 for this section!
+/* float getYHeight (float _x, float _z) {
+	float y = noise((_x+100) / 15, mySeed, (_z+100) / 15);
+	y *= 10;
+	y += dist(_x, _z, 0, 0) / 2;
+	return y;
+} 
+*/
