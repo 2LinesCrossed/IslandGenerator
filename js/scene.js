@@ -1,6 +1,5 @@
 import * as THREE from './lib/three.js';
 import { generateTerrain } from './terrain.js';
-import * as CONTROLS from './lib/OrbitControls.js';
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -8,7 +7,7 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
 var renderer = new THREE.WebGLRenderer();
 var cameraTarget = { x: 0, y: 0, z: 0 };
-
+var controls = new OrbitControls(camera, renderer.domElement);
 var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
