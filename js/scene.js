@@ -1,6 +1,6 @@
 import * as THREE from './lib/three.js';
-import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
+
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -8,7 +8,7 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
 var renderer = new THREE.WebGLRenderer();
 var cameraTarget = { x: 0, y: 0, z: 0 };
-var controls = new OrbitControls(camera, renderer.domElement);
+
 var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
@@ -38,16 +38,6 @@ export function initialiseScene() {
   // Add event listeners
   window.addEventListener('resize', onWindowResize);
 }
-//////////////
-// CONTROLS //
-//////////////
-
-// move mouse and: left   click to rotate,
-//                 middle click to zoom,
-//                 right  click to pan
-// add the new control and link to the current camera to transform its position
-
-var controls = new OrbitControls(camera, renderer.domElement);
 
 function onWindowResize() {
   //get the new sizes
@@ -67,7 +57,6 @@ function onWindowResize() {
 
 function update() {
   render();
-
   // Calculate delta time based on time after previous render
   var renderTime = performance.now();
   deltaTime = renderTime - lastRenderTime;
@@ -76,5 +65,4 @@ function update() {
 
 function render() {
   renderer.render(scene, camera);
-  controls.update();
 }
