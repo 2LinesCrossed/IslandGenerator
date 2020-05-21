@@ -65,7 +65,7 @@ function onWindowResize() {
   renderer.render(scene, camera);
 }
 
-function update() {
+export function update() {
   render();
 
   // Calculate delta time based on time after previous render
@@ -74,7 +74,7 @@ function update() {
   lastRenderTime = renderTime;
 }
 
-function render() {
+export function render() {
   renderer.render(scene, camera);
   controls.update();
 }
