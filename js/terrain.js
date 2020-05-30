@@ -5,7 +5,7 @@ import * as scene from './scene.js';
 
 var peak = 200;
 var smoothing = 600;
-var myseed = Math.random(1000);
+var myseed = Math.floor(1000 * Math.random());
 
 export function generateTerrain() {
   var geometry = new THREE.PlaneBufferGeometry(2000, 2000, 256, 256);
@@ -53,15 +53,16 @@ export function buildGUI() {
     smoothvalue: smoothing
   };
   //terrainControls = gui.addFolder('Terrain');
-  gui.add(params, 'hillpeak', 0, 5000).onChange(function (val) {
+  gui.add(params, 'hillpeak', 0, 1000).onChange(function (val) {
     peak = val;
     updateTerrain();
   });
   gui.add(params, 'randomseed', 0, 1000).onChange(function (val) {
+    //TODO: Make this one work
     myseed = val;
     updateTerrain();
   });
-  gui.add(params, 'smoothvalue', 0, 1000).onChange(function (val) {
+  gui.add(params, 'smoothvalue', 1, 1000).onChange(function (val) {
     smoothing = val;
     updateTerrain();
   });

@@ -1,4 +1,6 @@
 import * as THREE from './lib/three.js';
+import { gui } from './gui.js';
+
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
 var width = window.innerWidth;
@@ -13,39 +15,47 @@ var controls = new OrbitControls(camera, renderer.domElement);
 var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
+var sunPos = [2000, 2223, 300];
+
+var sun;
 var directionalLight;
 var terrain;
 
-// Scene Setup
+export function buildGUI() {
+  var params = {
+    sunPosX: sunPos[0]
+  };
+
+  gui.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
+    sunPos[0] = val;
+    updateSun();
+  });
+}
+
 export function initialiseScene() {
+  // Set camera pos
   camera.position.y = 70;
   camera.position.z = 1000;
   camera.rotation.x = (-15 * Math.PI) / 180;
 
+  // Renderer settings
   renderer.setClearColor(0xc3dde5, 100);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+  // Add to DOM
   document.body.appendChild(renderer.domElement);
 
   // Sky and sun (jiebin)
-  var skyGeometry = new THREE.SphereGeometry(3000, 32, 32);
+  var skyGeometry = new THREE.SphereGeometry(8000, 32, 32);
   var skyMaterial = new THREE.MeshMatcapMaterial({
     map: new THREE.TextureLoader().load('./textures/sky.png'),
     side: THREE.BackSide
   });
   var sky = new THREE.Mesh(skyGeometry, skyMaterial);
   scene.add(sky);
-  // Sun mesh
-  var sphereGeometry = new THREE.SphereGeometry(200, 30, 30);
-  var sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xf9d71c });
-  var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-  sphere.position.x = 2000;
-  sphere.position.y = 1223;
-  sphere.position.z = 300;
-  scene.add(sphere);
 
   // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
   var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
@@ -53,13 +63,18 @@ export function initialiseScene() {
   hemiLight.position.set(0, 500, 0);
   scene.add(hemiLight);
 
+  // Sun mesh
+  var sphereGeometry = new THREE.SphereGeometry(200, 30, 30);
+  var sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xf9d71c });
+  sun = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  scene.add(sun);
+
   // Directional light
   directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-  directionalLight.position
-    .set(sphere.position.x, sphere.position.y, sphere.position.z)
-    .normalize();
   directionalLight.castShadow = true;
   scene.add(directionalLight);
+
+  updateSun();
 
   terrain = generateTerrain();
   scene.add(terrain);
@@ -69,6 +84,11 @@ export function initialiseScene() {
 
   // Add event listeners
   window.addEventListener('resize', onWindowResize);
+}
+
+function updateSun() {
+  sun.position.set(...sunPos);
+  directionalLight.position.set(...sunPos).normalize();
 }
 //////////////
 // CONTROLS //
