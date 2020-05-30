@@ -1,11 +1,18 @@
 import * as DATGUI from './lib/dat.gui.module.js';
 
-const buildFunctions = [];
+const pendingBuildFunctions = [];
 
 let gui, folders;
 
+// Helper function to safely bind stuff to the GUI.
+// Calls the provided function immediately if loaded.
+// Otherwise, it will just add it to the list for later execution.
 export function buildGUI(buildFunction) {
-  buildFunctions.push(buildFunction);
+  if (gui) {
+    buildFunction(gui, folders);
+  } else {
+    pendingBuildFunctions.push(buildFunction);
+  }
 }
 
 export function initialiseGui() {
@@ -18,11 +25,11 @@ export function initialiseGui() {
     particles: gui.addFolder('Particles')
   };
 
-  // Open all the folders on startup
+  // Expand all of the folders
   Object.values(folders).forEach((folder) => {
     folder.open();
   });
 
-  // Run all the GUI build functions
-  buildFunctions.forEach((buildFunction) => buildFunction(gui, folders));
+  // Run all the functions passed to buildGUI
+  pendingBuildFunctions.forEach((buildFunction) => buildFunction(gui, folders));
 }
