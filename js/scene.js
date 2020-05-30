@@ -1,5 +1,5 @@
 import * as THREE from './lib/three.js';
-import { gui } from './gui.js';
+import { guiFolders } from './gui.js';
 
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
@@ -18,6 +18,7 @@ var lastRenderTime = performance.now();
 var deltaTime = 0.0; // The amount of time between frames (s)
 
 var sunPos = [2000, 2223, 300];
+var particleSpeed = 0.01;
 
 var sun;
 var directionalLight;
@@ -26,12 +27,15 @@ var particleSystem;
 
 export function buildGUI() {
   var params = {
-    sunPosX: sunPos[0]
+    sunPosX: sunPos[0],
+    particleSpeed
   };
-
-  gui.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
+  guiFolders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
     sunPos[0] = val;
     updateSun();
+  });
+  guiFolders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
+    particleSpeed = val;
   });
 }
 
@@ -126,7 +130,7 @@ function onWindowResize() {
 }
 
 export function update() {
-  particleSystem.rotation.y += 0.01 * deltaTime;
+  particleSystem.rotation.y += particleSpeed * deltaTime;
   render();
 
   // Calculate delta time based on time after previous render

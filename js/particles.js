@@ -1,7 +1,6 @@
 import * as THREE from './lib/three.js';
 
 // Particles are rendered as a single mesh with a vertex for each particle.
-
 export function createParticleSystem() {
   var count = 700;
   var size = 3000;
