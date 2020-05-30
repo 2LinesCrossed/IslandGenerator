@@ -5,14 +5,17 @@ var width = window.innerWidth;
 var height = window.innerHeight;
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
+var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 300000);
 var renderer = new THREE.WebGLRenderer();
+
 var cameraTarget = { x: 0, y: 0, z: 0 };
 var controls = new OrbitControls(camera, renderer.domElement);
 var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
-//Scene Setup
+var directionalLight;
+
+// Scene Setup
 export function initialiseScene() {
   camera.position.y = 70;
   camera.position.z = 1000;
@@ -21,13 +24,41 @@ export function initialiseScene() {
   renderer.setClearColor(0xc3dde5, 100);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
   document.body.appendChild(renderer.domElement);
 
-  var light = new THREE.DirectionalLight(0xffffff, 2);
-  light.position
-    .set(camera.position.x, camera.position.y + 500, camera.position.z + 500)
+  // Sky and sun (jiebin)
+  var skyGeometry = new THREE.SphereGeometry(3000, 32, 32);
+  var skyMaterial = new THREE.MeshMatcapMaterial({
+    map: new THREE.TextureLoader().load('./textures/sky.png'),
+    side: THREE.BackSide
+  });
+  var sky = new THREE.Mesh(skyGeometry, skyMaterial);
+  scene.add(sky);
+  // Sun mesh
+  var sphereGeometry = new THREE.SphereGeometry(200, 30, 30);
+  var sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xf9d71c });
+  var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  sphere.position.x = 2000;
+  sphere.position.y = 1223;
+  sphere.position.z = 300;
+  scene.add(sphere);
+
+  // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
+  var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
+  hemiLight.color.setHSL(0.6, 0.75, 0.5);
+  hemiLight.position.set(0, 500, 0);
+  scene.add(hemiLight);
+
+  // Directional light
+  directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+  directionalLight.position
+    .set(sphere.position.x, sphere.position.y, sphere.position.z)
     .normalize();
-  scene.add(light);
+  directionalLight.castShadow = true;
+  scene.add(directionalLight);
 
   var terrain = generateTerrain();
   scene.add(terrain);
