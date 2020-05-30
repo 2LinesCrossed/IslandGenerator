@@ -14,6 +14,7 @@ var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
 var directionalLight;
+var terrain;
 
 // Scene Setup
 export function initialiseScene() {
@@ -60,7 +61,7 @@ export function initialiseScene() {
   directionalLight.castShadow = true;
   scene.add(directionalLight);
 
-  var terrain = generateTerrain();
+  terrain = generateTerrain();
   scene.add(terrain);
 
   // Start the update loop
@@ -103,6 +104,12 @@ export function update() {
   var renderTime = performance.now();
   deltaTime = renderTime - lastRenderTime;
   lastRenderTime = renderTime;
+}
+
+export function setTerrain(newTerrain) {
+  scene.remove(terrain);
+  terrain = newTerrain;
+  scene.add(terrain);
 }
 
 export function render() {

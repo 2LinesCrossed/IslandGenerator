@@ -1,7 +1,8 @@
 import * as THREE from './lib/three.js';
 import { Perlin } from './lib/perlin.js';
-import * as DATGUI from './lib/dat.gui.module.js';
+import { gui } from './gui.js';
 import * as scene from './scene.js';
+
 var peak = 200;
 var smoothing = 600;
 var myseed = Math.random(1000);
@@ -40,8 +41,12 @@ export function generateTerrain() {
   return terrain;
 }
 
-function buildGUI() {
-  var gui = new DATGUI.GUI();
+function updateTerrain() {
+  const newTerrain = generateTerrain();
+  scene.setTerrain(newTerrain);
+}
+
+export function buildGUI() {
   var params = {
     hillpeak: peak,
     randomseed: myseed,
@@ -50,18 +55,18 @@ function buildGUI() {
   //terrainControls = gui.addFolder('Terrain');
   gui.add(params, 'hillpeak', 0, 5000).onChange(function (val) {
     peak = val;
-    scene.render();
+    updateTerrain();
   });
   gui.add(params, 'randomseed', 0, 1000).onChange(function (val) {
     myseed = val;
-    scene.render();
+    updateTerrain();
   });
   gui.add(params, 'smoothvalue', 0, 1000).onChange(function (val) {
     smoothing = val;
-    scene.render();
+    updateTerrain();
   });
 }
-buildGUI();
+
 /*void function getYPosition(float_x, float_z){
   var y = perlin.noise((float_x + 100) / 15, (float_z+100) / 15, mySeed);
   y *= 10;
