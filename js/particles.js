@@ -1,12 +1,15 @@
 import * as THREE from './lib/three.js';
 
 export function createParticleSystem() {
-  var count = 500;
+  var count = 700;
   var size = 3000;
   var particles = new THREE.Geometry();
   var material = new THREE.PointsMaterial({
     color: 0xffffff,
-    size: 30
+    size: 30,
+    map: THREE.ImageUtils.loadTexture('./textures/test_particle.png'),
+    blending: THREE.AdditiveBlending,
+    transparent: true
   });
 
   // Create individual particles and position them randomly
