@@ -1,5 +1,5 @@
 import * as THREE from './lib/three.js';
-import { guiFolders } from './gui.js';
+import { buildGUI } from './gui.js';
 
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
@@ -25,19 +25,29 @@ var directionalLight;
 var terrain;
 var particleSystem;
 
-export function buildGUI() {
+buildGUI((gui, folders) => {
   var params = {
     sunPosX: sunPos[0],
+    sunPosY: sunPos[1],
+    sunPosZ: sunPos[2],
     particleSpeed
   };
-  guiFolders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
+  folders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
     sunPos[0] = val;
     updateSun();
   });
-  guiFolders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
+  folders.lighting.add(params, 'sunPosY', -3000, 3000).onChange((val) => {
+    sunPos[1] = val;
+    updateSun();
+  });
+  folders.lighting.add(params, 'sunPosZ', -3000, 3000).onChange((val) => {
+    sunPos[2] = val;
+    updateSun();
+  });
+  folders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
     particleSpeed = val;
   });
-}
+});
 
 export function initialiseScene() {
   // Set camera pos
