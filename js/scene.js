@@ -1,35 +1,82 @@
 import * as THREE from './lib/three.js';
+import { gui } from './gui.js';
+
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
 var width = window.innerWidth;
 var height = window.innerHeight;
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
+var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 300000);
 var renderer = new THREE.WebGLRenderer();
+
 var cameraTarget = { x: 0, y: 0, z: 0 };
 var controls = new OrbitControls(camera, renderer.domElement);
 var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
-//Scene Setup
+var sunPos = [2000, 2223, 300];
+
+var sun;
+var directionalLight;
+var terrain;
+
+export function buildGUI() {
+  var params = {
+    sunPosX: sunPos[0]
+  };
+
+  gui.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
+    sunPos[0] = val;
+    updateSun();
+  });
+}
+
 export function initialiseScene() {
+  // Set camera pos
   camera.position.y = 70;
   camera.position.z = 1000;
   camera.rotation.x = (-15 * Math.PI) / 180;
 
+  // Renderer settings
   renderer.setClearColor(0xc3dde5, 100);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Add to DOM
   document.body.appendChild(renderer.domElement);
 
-  var light = new THREE.DirectionalLight(0xffffff, 2);
-  light.position
-    .set(camera.position.x, camera.position.y + 500, camera.position.z + 500)
-    .normalize();
-  scene.add(light);
+  // Sky and sun (jiebin)
+  var skyGeometry = new THREE.SphereGeometry(8000, 32, 32);
+  var skyMaterial = new THREE.MeshMatcapMaterial({
+    map: new THREE.TextureLoader().load('./textures/sky.png'),
+    side: THREE.BackSide
+  });
+  var sky = new THREE.Mesh(skyGeometry, skyMaterial);
+  scene.add(sky);
 
-  var terrain = generateTerrain();
+  // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
+  var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
+  hemiLight.color.setHSL(0.6, 0.75, 0.5);
+  hemiLight.position.set(0, 500, 0);
+  scene.add(hemiLight);
+
+  // Sun mesh
+  var sphereGeometry = new THREE.SphereGeometry(200, 30, 30);
+  var sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xf9d71c });
+  sun = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  scene.add(sun);
+
+  // Directional light
+  directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+  directionalLight.castShadow = true;
+  scene.add(directionalLight);
+
+  updateSun();
+
+  terrain = generateTerrain();
   scene.add(terrain);
 
   // Start the update loop
@@ -37,6 +84,11 @@ export function initialiseScene() {
 
   // Add event listeners
   window.addEventListener('resize', onWindowResize);
+}
+
+function updateSun() {
+  sun.position.set(...sunPos);
+  directionalLight.position.set(...sunPos).normalize();
 }
 //////////////
 // CONTROLS //
@@ -65,7 +117,7 @@ function onWindowResize() {
   renderer.render(scene, camera);
 }
 
-function update() {
+export function update() {
   render();
 
   // Calculate delta time based on time after previous render
@@ -74,7 +126,13 @@ function update() {
   lastRenderTime = renderTime;
 }
 
-function render() {
+export function setTerrain(newTerrain) {
+  scene.remove(terrain);
+  terrain = newTerrain;
+  scene.add(terrain);
+}
+
+export function render() {
   renderer.render(scene, camera);
   controls.update();
 }
