@@ -1,26 +1,35 @@
 import * as DATGUI from './lib/dat.gui.module.js';
-import { buildGUI as buildTerrainGUI } from './terrain.js';
-import { buildGUI as buildSceneGUI } from './scene.js';
 
-export let gui; // Can't use export default since this is reassigned :(
+const pendingBuildFunctions = [];
 
-export let guiFolders;
+let gui, folders;
+
+// Helper function to safely bind stuff to the GUI.
+// Calls the provided function immediately if loaded.
+// Otherwise, it will just add it to the list for later execution.
+export function buildGUI(buildFunction) {
+  if (gui) {
+    buildFunction(gui, folders);
+  } else {
+    pendingBuildFunctions.push(buildFunction);
+  }
+}
 
 export function initialiseGui() {
   gui = new DATGUI.GUI();
 
   // Create folders
-  guiFolders = {
-    lighting: gui.addFolder('Lighting'),
+  folders = {
     terrain: gui.addFolder('Terrain'),
+    lighting: gui.addFolder('Lighting'),
     particles: gui.addFolder('Particles')
   };
 
-  // Open all the folders on startup
-  Object.values(guiFolders).forEach((folder) => {
+  // Expand all of the folders
+  Object.values(folders).forEach((folder) => {
     folder.open();
   });
 
-  buildTerrainGUI();
-  buildSceneGUI();
+  // Run all the functions passed to buildGUI
+  pendingBuildFunctions.forEach((buildFunction) => buildFunction(gui, folders));
 }

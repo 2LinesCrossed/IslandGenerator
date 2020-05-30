@@ -1,5 +1,5 @@
 import * as THREE from './lib/three.js';
-import { guiFolders } from './gui.js';
+import { buildGUI } from './gui.js';
 
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
@@ -18,6 +18,7 @@ var lastRenderTime = performance.now();
 var deltaTime = 0.0; // The amount of time between frames (s)
 
 var sunPos = [2000, 2223, 300];
+var sunIntensity = 1;
 var particleSpeed = 0.01;
 
 var sun;
@@ -25,19 +26,30 @@ var directionalLight;
 var terrain;
 var particleSystem;
 
-export function buildGUI() {
+buildGUI((gui, folders) => {
   var params = {
     sunPosX: sunPos[0],
+    sunPosY: sunPos[1],
+    sunPosZ: sunPos[2],
+    sunIntensity,
     particleSpeed
   };
-  guiFolders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
+  folders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
     sunPos[0] = val;
-    updateSun();
   });
-  guiFolders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
+  folders.lighting.add(params, 'sunPosY', -3000, 3000).onChange((val) => {
+    sunPos[1] = val;
+  });
+  folders.lighting.add(params, 'sunPosZ', -3000, 3000).onChange((val) => {
+    sunPos[2] = val;
+  });
+  folders.lighting.add(params, 'sunIntensity', 0, 5).onChange((val) => {
+    sunIntensity = val;
+  });
+  folders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
     particleSpeed = val;
   });
-}
+});
 
 export function initialiseScene() {
   // Set camera pos
@@ -65,7 +77,7 @@ export function initialiseScene() {
   scene.add(sky);
 
   // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
-  var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
+  var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.7);
   hemiLight.color.setHSL(0.6, 0.75, 0.5);
   hemiLight.position.set(0, 500, 0);
   scene.add(hemiLight);
@@ -77,7 +89,7 @@ export function initialiseScene() {
   scene.add(sun);
 
   // Directional light
-  directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+  directionalLight = new THREE.DirectionalLight(0xffffff, sunIntensity);
   directionalLight.castShadow = true;
   scene.add(directionalLight);
 
@@ -98,10 +110,7 @@ export function initialiseScene() {
   window.addEventListener('resize', onWindowResize);
 }
 
-function updateSun() {
-  sun.position.set(...sunPos);
-  directionalLight.position.set(...sunPos).normalize();
-}
+function updateSun() {}
 //////////////
 // CONTROLS //
 //////////////
@@ -130,7 +139,15 @@ function onWindowResize() {
 }
 
 export function update() {
+  // Update sun
+  sun.position.set(...sunPos);
+  directionalLight.position.set(...sunPos).normalize();
+  directionalLight.intensity = sunIntensity;
+
+  // Animate particles
   particleSystem.rotation.y += particleSpeed * deltaTime;
+
+  // Finally render
   render();
 
   // Calculate delta time based on time after previous render

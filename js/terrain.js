@@ -1,15 +1,37 @@
 import * as THREE from './lib/three.js';
 import { Perlin } from './lib/perlin.js';
-import { guiFolders } from './gui.js';
+import { buildGUI } from './gui.js';
 import * as scene from './scene.js';
 
 var peak = 200;
 var smoothing = 600;
 var myseed = Math.floor(1000 * Math.random());
 
+buildGUI((gui, folders) => {
+  var params = {
+    hillpeak: peak,
+    randomseed: myseed,
+    smoothvalue: smoothing
+  };
+
+  folders.terrain.add(params, 'hillpeak', 0, 1000).onChange(function (val) {
+    peak = val;
+    updateTerrain();
+  });
+  folders.terrain.add(params, 'randomseed', 0, 1000).onChange(function (val) {
+    //TODO: Make this one work
+    myseed = val;
+    updateTerrain();
+  });
+  folders.terrain.add(params, 'smoothvalue', 1, 1000).onChange(function (val) {
+    smoothing = val;
+    updateTerrain();
+  });
+});
+
 export function generateTerrain() {
   var geometry = new THREE.PlaneBufferGeometry(2000, 2000, 256, 256);
-  var material = new THREE.MeshLambertMaterial({ color: 0x3c3951 });
+  var material = new THREE.MeshLambertMaterial({ color: 0x356932 });
 
   var terrain = new THREE.Mesh(geometry, material);
   terrain.rotation.x = -Math.PI / 2;
@@ -44,32 +66,6 @@ export function generateTerrain() {
 function updateTerrain() {
   const newTerrain = generateTerrain();
   scene.setTerrain(newTerrain);
-}
-
-export function buildGUI() {
-  var params = {
-    hillpeak: peak,
-    randomseed: myseed,
-    smoothvalue: smoothing
-  };
-
-  guiFolders.terrain.add(params, 'hillpeak', 0, 1000).onChange(function (val) {
-    peak = val;
-    updateTerrain();
-  });
-  guiFolders.terrain
-    .add(params, 'randomseed', 0, 1000)
-    .onChange(function (val) {
-      //TODO: Make this one work
-      myseed = val;
-      updateTerrain();
-    });
-  guiFolders.terrain
-    .add(params, 'smoothvalue', 1, 1000)
-    .onChange(function (val) {
-      smoothing = val;
-      updateTerrain();
-    });
 }
 
 /*void function getYPosition(float_x, float_z){
