@@ -21,6 +21,8 @@ export function initialiseGui() {
     folder.open();
   });
 
+  // Call buildGUI functions of different components
+  // (TODO: Maybe change this to not be a violation of the open/closed principle, using some kind of priority system)
   buildTerrainGUI();
   buildSceneGUI();
 }
