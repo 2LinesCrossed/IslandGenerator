@@ -1,6 +1,6 @@
 import * as THREE from './lib/three.js';
 import { Perlin } from './lib/perlin.js';
-import { gui } from './gui.js';
+import { guiFolders } from './gui.js';
 import * as scene from './scene.js';
 
 var peak = 200;
@@ -52,20 +52,24 @@ export function buildGUI() {
     randomseed: myseed,
     smoothvalue: smoothing
   };
-  //terrainControls = gui.addFolder('Terrain');
-  gui.add(params, 'hillpeak', 0, 1000).onChange(function (val) {
+
+  guiFolders.terrain.add(params, 'hillpeak', 0, 1000).onChange(function (val) {
     peak = val;
     updateTerrain();
   });
-  gui.add(params, 'randomseed', 0, 1000).onChange(function (val) {
-    //TODO: Make this one work
-    myseed = val;
-    updateTerrain();
-  });
-  gui.add(params, 'smoothvalue', 1, 1000).onChange(function (val) {
-    smoothing = val;
-    updateTerrain();
-  });
+  guiFolders.terrain
+    .add(params, 'randomseed', 0, 1000)
+    .onChange(function (val) {
+      //TODO: Make this one work
+      myseed = val;
+      updateTerrain();
+    });
+  guiFolders.terrain
+    .add(params, 'smoothvalue', 1, 1000)
+    .onChange(function (val) {
+      smoothing = val;
+      updateTerrain();
+    });
 }
 
 /*void function getYPosition(float_x, float_z){
