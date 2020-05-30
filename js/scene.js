@@ -14,9 +14,9 @@ var controls = new OrbitControls(camera, renderer.domElement);
 var lastRenderTime = performance.now();
 var deltaTime = 0; // The amount of time between frames (ms)
 
-var light;
+var directionalLight;
 
-//Scene Setup
+// Scene Setup
 export function initialiseScene() {
   camera.position.y = 70;
   camera.position.z = 1000;
@@ -38,20 +38,28 @@ export function initialiseScene() {
   });
   var sky = new THREE.Mesh(skyGeometry, skyMaterial);
   scene.add(sky);
-  //sun
+  // Sun mesh
   var sphereGeometry = new THREE.SphereGeometry(200, 30, 30);
   var sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xf9d71c });
   var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
   sphere.position.x = 2000;
-  sphere.position.y = 1223; //maximum 380
+  sphere.position.y = 1223;
   sphere.position.z = 300;
   scene.add(sphere);
 
-  light = new THREE.DirectionalLight(0xffffff, 2);
-  light.position
+  // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
+  var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
+  hemiLight.color.setHSL(0.6, 0.75, 0.5);
+  hemiLight.position.set(0, 500, 0);
+  scene.add(hemiLight);
+
+  // Directional light
+  directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+  directionalLight.position
     .set(sphere.position.x, sphere.position.y, sphere.position.z)
     .normalize();
-  scene.add(light);
+  directionalLight.castShadow = true;
+  scene.add(directionalLight);
 
   var terrain = generateTerrain();
   scene.add(terrain);
