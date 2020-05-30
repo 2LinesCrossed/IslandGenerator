@@ -15,13 +15,14 @@ var renderer = new THREE.WebGLRenderer();
 var cameraTarget = { x: 0, y: 0, z: 0 };
 var controls = new OrbitControls(camera, renderer.domElement);
 var lastRenderTime = performance.now();
-var deltaTime = 0; // The amount of time between frames (ms)
+var deltaTime = 0.0; // The amount of time between frames (s)
 
 var sunPos = [2000, 2223, 300];
 
 var sun;
 var directionalLight;
 var terrain;
+var particleSystem;
 
 export function buildGUI() {
   var params = {
@@ -83,7 +84,7 @@ export function initialiseScene() {
   scene.add(terrain);
 
   // Particle system
-  var particleSystem = createParticleSystem();
+  particleSystem = createParticleSystem();
   scene.add(particleSystem);
 
   // Start the update loop
@@ -125,11 +126,12 @@ function onWindowResize() {
 }
 
 export function update() {
+  particleSystem.rotation.y += 0.01 * deltaTime;
   render();
 
   // Calculate delta time based on time after previous render
   var renderTime = performance.now();
-  deltaTime = renderTime - lastRenderTime;
+  deltaTime = (renderTime - lastRenderTime) / 1000.0;
   lastRenderTime = renderTime;
 }
 
