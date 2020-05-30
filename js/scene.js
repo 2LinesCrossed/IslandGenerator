@@ -3,6 +3,8 @@ import { gui } from './gui.js';
 
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
+import { createParticleSystem } from './particles.js';
+
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -76,8 +78,13 @@ export function initialiseScene() {
 
   updateSun();
 
+  // Terrain
   terrain = generateTerrain();
   scene.add(terrain);
+
+  // Particle system
+  var particleSystem = createParticleSystem();
+  scene.add(particleSystem);
 
   // Start the update loop
   renderer.setAnimationLoop(update);
