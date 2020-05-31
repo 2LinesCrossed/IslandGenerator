@@ -21,6 +21,7 @@ export function initialiseGui() {
   // Create folders
   folders = {
     terrain: gui.addFolder('Terrain'),
+    water: gui.addFolder('Water'),
     lighting: gui.addFolder('Lighting'),
     particles: gui.addFolder('Particles')
   };

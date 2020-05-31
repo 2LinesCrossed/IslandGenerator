@@ -1,10 +1,12 @@
 import * as THREE from './lib/three.js';
-import { buildGUI } from './gui.js';
-
 import { OrbitControls } from './lib/orbitControls.js';
+
+import { buildGUI } from './gui.js';
 import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
 import { createParticleSystem } from './particles.js';
+
+export const cubeCamera = new THREE.CubeCamera(0.001, 50000, 512);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
@@ -16,10 +18,12 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   300000
 );
+
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
-const waterObj = createWater();
+
+const water = createWater();
 
 let cameraTarget = { x: 0, y: 0, z: 0 };
 let lastRenderTime = performance.now();
@@ -29,7 +33,7 @@ let sunPos = [2000, 2223, 300];
 let sunIntensity = 1;
 let particleSpeed = 0.01;
 
-let sun, directionalLight, terrain, particleSystem;
+let sun, sky, directionalLight, terrain, particleSystem;
 
 buildGUI((gui, folders) => {
   const params = {
@@ -63,7 +67,7 @@ export function initialiseScene() {
   camera.rotation.x = (-15 * Math.PI) / 180;
 
   // Renderer settings
-  renderer.setClearColor(0xc3dde5, 100);
+  renderer.setClearColor(0x000000, 100);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(initialWidth, initialHeight);
   renderer.shadowMap.enabled = true;
@@ -78,7 +82,7 @@ export function initialiseScene() {
     map: new THREE.TextureLoader().load('./textures/sky.png'),
     side: THREE.BackSide
   });
-  const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+  sky = new THREE.Mesh(skyGeometry, skyMaterial);
   scene.add(sky);
 
   // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
@@ -103,11 +107,14 @@ export function initialiseScene() {
   scene.add(terrain);
 
   // Water
-  scene.add(waterObj.plane);
+  scene.add(water);
 
   // Particle system
   particleSystem = createParticleSystem();
   scene.add(particleSystem);
+
+  // Cube camera (for water reflections)
+  scene.add(cubeCamera);
 
   // Start the update loop
   renderer.setAnimationLoop(update);
@@ -139,7 +146,7 @@ export function update() {
   directionalLight.intensity = sunIntensity;
 
   // Animate water
-  updateWater(waterObj, lastRenderTime);
+  updateWater(lastRenderTime);
 
   // Animate particles
   particleSystem.rotation.y += particleSpeed * deltaTime;
@@ -160,6 +167,26 @@ export function setTerrain(newTerrain) {
 }
 
 export function render() {
+  // Update water reflections
+  // Hide sky and water so reflection isn't affected
+  water.visible = false;
+  sky.visible = false;
+
+  cubeCamera.position.set(
+    camera.position.x,
+    -camera.position.y,
+    camera.position.z
+  );
+
+  // Render the reflection
+  cubeCamera.update(renderer, scene);
+
+  // Make water and sky visible again
+  water.visible = true;
+  sky.visible = true;
+
+  // Finally render the frame
   renderer.render(scene, camera);
+
   controls.update();
 }

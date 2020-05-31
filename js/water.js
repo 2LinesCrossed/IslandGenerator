@@ -1,4 +1,28 @@
 import * as THREE from './lib/three.js';
+import { buildGUI } from './gui.js';
+
+import { cubeCamera } from './scene.js';
+
+let waterObj = {};
+
+let frequency = 0.01;
+let amplitude = 2.8;
+
+buildGUI((gui, folders) => {
+  var params = {
+    frequency,
+    amplitude
+  };
+
+  folders.water.add(params, 'frequency', 0, 0.2).onChange(function (val) {
+    frequency = val;
+    waterObj.shader.uniforms.frequency.value = frequency;
+  });
+  folders.water.add(params, 'amplitude', 0, 100).onChange(function (val) {
+    amplitude = val;
+    waterObj.shader.uniforms.amplitude.value = amplitude;
+  });
+});
 
 export function createWater() {
   const albedo = THREE.ImageUtils.loadTexture('./textures/seawater.jpg');
@@ -6,23 +30,30 @@ export function createWater() {
     './textures/seawater_normals.jpg'
   );
 
+  const tileAmt = 2;
+
   albedo.wrapS = THREE.RepeatWrapping;
   albedo.wrapT = THREE.RepeatWrapping;
-  albedo.repeat.set(4, 4);
+  albedo.repeat.set(tileAmt, tileAmt);
 
   normalMap.wrapS = THREE.RepeatWrapping;
   normalMap.wrapT = THREE.RepeatWrapping;
-  normalMap.repeat.set(4, 4);
+  normalMap.repeat.set(tileAmt, tileAmt);
 
   const material = new THREE.MeshPhysicalMaterial({
     color: 0x1f3a4d,
     map: albedo,
     normalMap: normalMap,
-    normalScale: new THREE.Vector2(0.8, 0.8),
+    normalScale: new THREE.Vector2(0.1, 0.001),
+    clearcoat: 0.9,
+    clearcoatMap: albedo,
+    clearcoatNormalMap: normalMap,
+    clearcoatNormalScale: new THREE.Vector2(0.9, 1),
+    clearcoatRoughness: 0.01,
     transparent: true,
-    roughness: 0.1,
-    transparency: 0.35,
-    reflectivity: 1.1
+    roughness: 0.01,
+    transparency: 0.2,
+    reflectivity: 1.8
   });
 
   const declarationsGLSL = 'uniform float time, frequency, amplitude;\n';
@@ -39,11 +70,14 @@ export function createWater() {
     vNormal = normalMatrix * objectNormal;
   `;
 
-  const waterObj = {};
   material.onBeforeCompile = (shader) => {
     shader.uniforms.time = { value: 0 };
-    shader.uniforms.frequency = { value: 0.01 };
-    shader.uniforms.amplitude = { value: 20.0 };
+    shader.uniforms.frequency = {
+      value: frequency
+    };
+    shader.uniforms.amplitude = {
+      value: amplitude
+    };
 
     // Add new declarations to top of existing shader code
     shader.vertexShader = declarationsGLSL + shader.vertexShader;
@@ -66,10 +100,11 @@ export function createWater() {
 
   waterObj.plane = plane;
   waterObj.material = material;
-  return waterObj;
+  return plane;
 }
 
-export function updateWater({ plane, shader, material }, time) {
+export function updateWater(time) {
+  const { shader, material } = waterObj;
   if (!shader) {
     console.log('Water shader still compiling...');
     return;
@@ -77,6 +112,11 @@ export function updateWater({ plane, shader, material }, time) {
 
   shader.uniforms.time.value = 0.2 * time;
 
+  if (!material.envMap) {
+    material.envMap = cubeCamera.renderTarget.texture;
+    material.envMapIntensity = 1;
+    material.needsUpdate = true;
+  }
   const texturePanSpd = 0.00004;
   material.normalMap.offset.set(texturePanSpd * time, 0);
   material.map.offset.set(texturePanSpd * time, 0);
