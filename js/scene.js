@@ -3,7 +3,7 @@ import { buildGUI } from './gui.js';
 
 import { OrbitControls } from './lib/orbitControls.js';
 import { generateTerrain } from './terrain.js';
-import { createWater } from './water.js';
+import { createWater, updateWater } from './water.js';
 import { createParticleSystem } from './particles.js';
 
 const initialWidth = window.innerWidth;
@@ -139,11 +139,7 @@ export function update() {
   directionalLight.intensity = sunIntensity;
 
   // Animate water
-  if (waterObj.shader) {
-    waterObj.shader.uniforms.time.value = 0.2 * lastRenderTime;
-  } else {
-    console.log('Water shader still compiling...');
-  }
+  updateWater(waterObj, lastRenderTime);
 
   // Animate particles
   particleSystem.rotation.y += particleSpeed * deltaTime;
