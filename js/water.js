@@ -1,12 +1,28 @@
 import * as THREE from './lib/three.js';
 
 export function createWater() {
+  const albedo = THREE.ImageUtils.loadTexture('./textures/seawater.jpg');
+  const normalMap = THREE.ImageUtils.loadTexture(
+    './textures/seawater_normals.jpg'
+  );
+
+  albedo.wrapS = THREE.RepeatWrapping;
+  albedo.wrapT = THREE.RepeatWrapping;
+  albedo.repeat.set(4, 4);
+
+  normalMap.wrapS = THREE.RepeatWrapping;
+  normalMap.wrapT = THREE.RepeatWrapping;
+  normalMap.repeat.set(4, 4);
+
   const material = new THREE.MeshPhysicalMaterial({
-    color: 0x2ea1ff,
+    color: 0x1f3a4d,
+    map: albedo,
+    normalMap: normalMap,
+    normalScale: new THREE.Vector2(0.8, 0.8),
     transparent: true,
-    roughness: 0.4,
-    transparency: 0.3,
-    reflectivity: 1.0
+    roughness: 0.1,
+    transparency: 0.35,
+    reflectivity: 1.1
   });
 
   const declarationsGLSL = 'uniform float time, frequency, amplitude;\n';
@@ -42,12 +58,26 @@ export function createWater() {
     waterObj.shader = shader;
   };
   const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(6000, 6000, 100, 100),
+    new THREE.PlaneBufferGeometry(2000, 2000, 100, 100),
     material
   );
 
   plane.rotation.x = (-90 * Math.PI) / 180;
 
   waterObj.plane = plane;
+  waterObj.material = material;
   return waterObj;
+}
+
+export function updateWater({ plane, shader, material }, time) {
+  if (!shader) {
+    console.log('Water shader still compiling...');
+    return;
+  }
+
+  shader.uniforms.time.value = 0.2 * time;
+
+  const texturePanSpd = 0.00004;
+  material.normalMap.offset.set(texturePanSpd * time, 0);
+  material.map.offset.set(texturePanSpd * time, 0);
 }
