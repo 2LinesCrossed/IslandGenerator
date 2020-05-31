@@ -10,6 +10,7 @@ export function createParticleSystem() {
     size: 30,
     map: THREE.ImageUtils.loadTexture('./textures/test_particle.png'),
     blending: THREE.AdditiveBlending,
+    depthWrite: false, // Prevents particle alpha from glitching with other transparent materials
     transparent: true
   });
 
@@ -26,6 +27,5 @@ export function createParticleSystem() {
     // Add point as vertex
     particles.vertices.push(point);
   }
-
   return new THREE.Points(particles, material);
 }
