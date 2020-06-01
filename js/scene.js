@@ -6,7 +6,7 @@ import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
 import { createParticleSystem } from './particles.js';
 
-const defaultReflectionSize = 128;
+const defaultReflectionSize = 200;
 
 export const reflectionRenderTarget = new THREE.WebGLCubeRenderTarget(
   defaultReflectionSize
@@ -187,7 +187,7 @@ export function render() {
 
   // Don't render particles if reflection resolution is low
   // (particles take up too much of the reflection map otherwise)
-  if (reflectionRenderTarget.width < 120) {
+  if (reflectionRenderTarget.width < 180) {
     particleSystem.visible = false;
   }
 
