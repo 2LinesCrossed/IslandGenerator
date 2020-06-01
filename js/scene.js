@@ -6,7 +6,13 @@ import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
 import { createParticleSystem } from './particles.js';
 
-export const cubeCamera = new THREE.CubeCamera(0.001, 50000, 512);
+const defaultReflectionSize = 128;
+
+export const reflectionRenderTarget = new THREE.WebGLCubeRenderTarget(
+  defaultReflectionSize
+);
+
+const cubeCamera = new THREE.CubeCamera(0.001, 15000, reflectionRenderTarget);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
@@ -16,7 +22,7 @@ const camera = new THREE.PerspectiveCamera(
   45,
   initialWidth / initialHeight,
   0.1,
-  300000
+  100000
 );
 
 const renderer = new THREE.WebGLRenderer();
@@ -41,7 +47,8 @@ buildGUI((gui, folders) => {
     sunPosY: sunPos[1],
     sunPosZ: sunPos[2],
     sunIntensity,
-    particleSpeed
+    particleSpeed,
+    reflectionResolution: defaultReflectionSize
   };
   folders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
     sunPos[0] = val;
@@ -58,6 +65,11 @@ buildGUI((gui, folders) => {
   folders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
     particleSpeed = val;
   });
+  folders.rendering
+    .add(params, 'reflectionResolution', 0, 512)
+    .onChange((val) => {
+      cubeCamera.renderTarget.setSize(val, val);
+    });
 });
 
 export function initialiseScene() {
@@ -168,22 +180,31 @@ export function setTerrain(newTerrain) {
 
 export function render() {
   // Update water reflections
+
   // Hide sky and water so reflection isn't affected
   water.visible = false;
   sky.visible = false;
 
+  // Don't render particles if reflection resolution is low
+  // (particles take up too much of the reflection map otherwise)
+  if (reflectionRenderTarget.width < 120) {
+    particleSystem.visible = false;
+  }
+
+  // Update position of reflection camera
   cubeCamera.position.set(
     camera.position.x,
-    -camera.position.y,
+    -camera.position.y, // Negative so that the underside of the world is rendered
     camera.position.z
   );
 
   // Render the reflection
   cubeCamera.update(renderer, scene);
 
-  // Make water and sky visible again
+  // Make hidden stuff visible again for main render
   water.visible = true;
   sky.visible = true;
+  particleSystem.visible = true;
 
   // Finally render the frame
   renderer.render(scene, camera);

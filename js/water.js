@@ -1,12 +1,12 @@
 import * as THREE from './lib/three.js';
 import { buildGUI } from './gui.js';
 
-import { cubeCamera } from './scene.js';
+import { reflectionRenderTarget } from './scene.js';
 
 let waterObj = {};
 
-let frequency = 0.01;
-let amplitude = 2.8;
+let frequency = 0.05;
+let amplitude = 0.5;
 
 buildGUI((gui, folders) => {
   var params = {
@@ -18,7 +18,7 @@ buildGUI((gui, folders) => {
     frequency = val;
     waterObj.shader.uniforms.frequency.value = frequency;
   });
-  folders.water.add(params, 'amplitude', 0, 100).onChange(function (val) {
+  folders.water.add(params, 'amplitude', 0, 50.0).onChange(function (val) {
     amplitude = val;
     waterObj.shader.uniforms.amplitude.value = amplitude;
   });
@@ -113,10 +113,11 @@ export function updateWater(time) {
   shader.uniforms.time.value = 0.2 * time;
 
   if (!material.envMap) {
-    material.envMap = cubeCamera.renderTarget.texture;
+    material.envMap = reflectionRenderTarget.texture;
     material.envMapIntensity = 1;
     material.needsUpdate = true;
   }
+
   const texturePanSpd = 0.00004;
   material.normalMap.offset.set(texturePanSpd * time, 0);
   material.map.offset.set(texturePanSpd * time, 0);
