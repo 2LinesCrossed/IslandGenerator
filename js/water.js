@@ -7,20 +7,25 @@ let waterObj = {};
 
 let frequency = 0.05;
 let amplitude = 0.5;
+let waterSpeed = 1;
 
 buildGUI((gui, folders) => {
   var params = {
     frequency,
-    amplitude
+    amplitude,
+    waterSpeed
   };
 
   folders.water.add(params, 'frequency', 0, 0.2).onChange(function (val) {
     frequency = val;
     waterObj.shader.uniforms.frequency.value = frequency;
   });
-  folders.water.add(params, 'amplitude', 0, 50.0).onChange(function (val) {
+  folders.water.add(params, 'amplitude', 0, 10.0).onChange(function (val) {
     amplitude = val;
     waterObj.shader.uniforms.amplitude.value = amplitude;
+  });
+  folders.water.add(params, 'waterSpeed', 0, 5.0).onChange(function (val) {
+    waterSpeed = val;
   });
 });
 
@@ -110,7 +115,7 @@ export function updateWater(time) {
     return;
   }
 
-  shader.uniforms.time.value = 0.2 * time;
+  shader.uniforms.time.value = waterSpeed * 0.2 * time;
 
   if (!material.envMap) {
     material.envMap = reflectionRenderTarget.texture;
@@ -118,7 +123,7 @@ export function updateWater(time) {
     material.needsUpdate = true;
   }
 
-  const texturePanSpd = 0.00004;
+  const texturePanSpd = waterSpeed * 0.00004;
   material.normalMap.offset.set(texturePanSpd * time, 0);
   material.map.offset.set(texturePanSpd * time, 0);
 }
