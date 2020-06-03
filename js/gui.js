@@ -18,6 +18,34 @@ export function buildGUI(buildFunction) {
 export function initialiseGui() {
   gui = new DATGUI.GUI();
 
+  // Modify the function for adding items so that default parameters are automatically "remembered",
+  // because having to call gui.remember() every time you add an item is dumb.
+  // This allows for the entire state to be saved, loaded, and reset.
+  const addFunc = gui.add;
+  gui.add = (...args) => {
+    const params = args[0];
+    gui.remember(params);
+    return addFunc.bind(gui)(...args);
+  };
+
+  // Do the same for items in folders when they are created (and also force them to expand).
+  // This does not work for nested folders, so if we ever add those this would get more complicated.
+  const addFolderFunc = gui.addFolder;
+  gui.addFolder = (...args) => {
+    const folder = addFolderFunc.bind(gui)(...args);
+
+    const folderAddFunc = folder.add;
+    folder.add = (...args) => {
+      const params = args[0];
+      gui.remember(params);
+      return folderAddFunc.bind(folder)(...args);
+    };
+
+    // Expand folder
+    folder.open();
+    return folder;
+  };
+
   // Create folders
   folders = {
     rendering: gui.addFolder('Rendering'),
@@ -26,11 +54,6 @@ export function initialiseGui() {
     lighting: gui.addFolder('Lighting'),
     particles: gui.addFolder('Particles')
   };
-
-  // Expand all of the folders
-  Object.values(folders).forEach((folder) => {
-    folder.open();
-  });
 
   // Run all the functions passed to buildGUI
   pendingBuildFunctions.forEach((buildFunction) => buildFunction(gui, folders));
