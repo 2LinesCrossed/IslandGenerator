@@ -36,10 +36,14 @@ let lastRenderTime = performance.now();
 let deltaTime = 0.0; // The amount of time between frames (s)
 
 let sunPos = [2000, 2223, 300];
-let sunIntensity = 1;
+let hemiLightIntensity;
+let sunIntensity = 0.5;
 let particleSpeed = 0.01;
 
-let sun, sky, directionalLight, terrain, particleSystem;
+let sun, sky, hemiLight, directionalLight, terrain, particleSystem;
+let cloudParticles = [];
+let starParticles = [];
+let star = false;
 
 buildGUI((gui, folders) => {
   const params = {
@@ -53,7 +57,7 @@ buildGUI((gui, folders) => {
   folders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
     sunPos[0] = val;
   });
-  folders.lighting.add(params, 'sunPosY', -3000, 3000).onChange((val) => {
+  folders.lighting.add(params, 'sunPosY', 0, 3000).onChange((val) => {
     sunPos[1] = val;
   });
   folders.lighting.add(params, 'sunPosZ', -3000, 3000).onChange((val) => {
@@ -90,7 +94,7 @@ export function initialiseScene() {
 
   // Sky and sun (jiebin)
   const skyGeometry = new THREE.SphereGeometry(8000, 32, 32);
-  const skyMaterial = new THREE.MeshMatcapMaterial({
+  const skyMaterial = new THREE.MeshLambertMaterial({
     map: new THREE.TextureLoader().load('./textures/sky.png'),
     side: THREE.BackSide
   });
@@ -98,16 +102,21 @@ export function initialiseScene() {
   scene.add(sky);
 
   // Hemisphere light (simulates scattered sunlight and prevents shadows from looking too harsh)
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.7);
+  hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, hemiLightIntensity);
   hemiLight.color.setHSL(0.6, 0.75, 0.5);
   hemiLight.position.set(0, 500, 0);
   scene.add(hemiLight);
 
   // Sun mesh
-  const sphereGeometry = new THREE.SphereGeometry(200, 30, 30);
+  const sphereGeometry = new THREE.SphereGeometry(100, 30, 30);
   const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xf9d71c });
   sun = new THREE.Mesh(sphereGeometry, sphereMaterial);
   scene.add(sun);
+
+  //cloud
+  createCloud();
+  //star
+  //createStar();
 
   // Directional light
   directionalLight = new THREE.DirectionalLight(0xffffff, sunIntensity);
@@ -135,6 +144,54 @@ export function initialiseScene() {
   window.addEventListener('resize', onWindowResize);
 }
 
+//cloud
+function createCloud() {
+  const cloudGeometry = new THREE.PlaneBufferGeometry(500, 500);
+  const cloudMaterial = new THREE.MeshLambertMaterial({
+    map: new THREE.TextureLoader().load('./textures/try3.png'),
+    transparent: true
+  });
+  for (let p = 0; p < 8; p++) {
+    let cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+    cloud.position.set(
+      -1000 + p * 300,
+      1500,
+      Math.random() * 1700 - 400
+    );
+    cloud.rotation.x = 1.16;
+    cloud.rotation.y = -0.12;
+    cloud.rotation.z = Math.random() * 2 * Math.PI;
+    cloud.material.opacity = 0.75;
+    cloudParticles.push(cloud);
+    scene.add(cloud);
+  }
+}
+
+//star
+function createStar() {
+  const starGeometry = new THREE.PlaneBufferGeometry(50, 50);
+  const starMaterial = new THREE.MeshLambertMaterial({
+    map: new THREE.TextureLoader().load('./textures/try.png'),
+    transparent: true
+  });
+  if (star) {
+    for (let p = 0; p < 9; p++) {
+      let star = new THREE.Mesh(starGeometry, starMaterial);
+      star.position.set(
+        Math.random() * 1700 - 400,
+        2000,
+        -1000 + p * 300
+      );
+      star.rotation.x = 1.16;
+      star.rotation.y = -0.12;
+      star.rotation.z = Math.random() * 2 * Math.PI;
+      star.material.opacity = 0.75;
+      starParticles.push(star);
+      scene.add(star);
+    }
+  }
+}
+
 function onWindowResize() {
   //get the new sizes
   const width = window.innerWidth;
@@ -156,6 +213,26 @@ export function update() {
   sun.position.set(...sunPos);
   directionalLight.position.set(...sunPos).normalize();
   directionalLight.intensity = sunIntensity;
+
+  //Update day,night light and adding the cloud | star
+  if (sun.position.y > 0) {
+    hemiLight.intensity = sun.position.y * 0.0007;
+    //if (sun.position.y < 1000) {
+    // star = true;
+    //  createStar();
+
+    //}
+
+  }
+
+  //update cloud 
+  cloudParticles.forEach(p => {
+    p.rotation.z -= 0.002;
+  });
+  //update star
+  //starParticles.forEach(p => {
+  //  p.rotation.z -= 0.01;
+  //});
 
   // Animate water
   updateWater(lastRenderTime);
