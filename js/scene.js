@@ -1,6 +1,6 @@
 import * as THREE from './lib/three.js';
 import { OrbitControls } from './lib/orbitControls.js';
-
+import { GLTFLoader } from './lib/GLTFLoader.js';
 import { buildGUI } from './gui.js';
 import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
@@ -127,6 +127,9 @@ export function initialiseScene() {
   terrain = generateTerrain();
   scene.add(terrain);
 
+  //load 3D Models
+  loadModels();
+
   // Water
   scene.add(water);
 
@@ -153,11 +156,7 @@ function createCloud() {
   });
   for (let p = 0; p < 8; p++) {
     let cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    cloud.position.set(
-      -1000 + p * 300,
-      1500,
-      Math.random() * 1700 - 400
-    );
+    cloud.position.set(-1000 + p * 300, 1500, Math.random() * 1700 - 400);
     cloud.rotation.x = 1.16;
     cloud.rotation.y = -0.12;
     cloud.rotation.z = Math.random() * 2 * Math.PI;
@@ -177,11 +176,7 @@ function createStar() {
   if (star) {
     for (let p = 0; p < 9; p++) {
       let star = new THREE.Mesh(starGeometry, starMaterial);
-      star.position.set(
-        Math.random() * 1700 - 400,
-        2000,
-        -1000 + p * 300
-      );
+      star.position.set(Math.random() * 1700 - 400, 2000, -1000 + p * 300);
       star.rotation.x = 1.16;
       star.rotation.y = -0.12;
       star.rotation.z = Math.random() * 2 * Math.PI;
@@ -190,6 +185,38 @@ function createStar() {
       scene.add(star);
     }
   }
+}
+// Models q
+function loadModels() {
+  //loader
+  var loader = new GLTFLoader();
+  // create material of geo
+  var material_cube = new THREE.MeshLambertMaterial();
+  // wireframe
+  material_cube.wireframe = false;
+  // create box geo
+  var geo_cube = new THREE.BoxGeometry(5, 0.1, 5);
+  // create box mesh
+  var box_mesh = new THREE.Mesh(geo_cube, material_cube);
+  box_mesh.castShadow = true;
+  box_mesh.receiveShadow = true;
+  // add geo to scene
+  scene.add(box_mesh);
+  // instantiate a 3dObject
+  loader.load('models/dragon/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        object.position.set(0, 20, 0);
+        /*var mixer = new THREE.AnimationMixer(gltf.scene);
+        var action = mixer.clipAction(gltf.animations[0]);
+        action.play();*/
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
 }
 
 function onWindowResize() {
@@ -222,11 +249,10 @@ export function update() {
     //  createStar();
 
     //}
-
   }
 
-  //update cloud 
-  cloudParticles.forEach(p => {
+  //update cloud
+  cloudParticles.forEach((p) => {
     p.rotation.z -= 0.002;
   });
   //update star
