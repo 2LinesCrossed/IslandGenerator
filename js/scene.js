@@ -145,6 +145,8 @@ export function initialiseScene() {
 
   // Add event listeners
   window.addEventListener('resize', onWindowResize);
+
+  console.log(terrain.geometry.attributes.position);
 }
 
 //cloud
@@ -203,15 +205,49 @@ function loadModels() {
   // add geo to scene
   scene.add(box_mesh);
   // instantiate a 3dObject
+
   loader.load('models/dragon/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
       if (object.isMesh) {
         object.castShadow = true;
         object.receiveShadow = true;
-        object.position.set(0, 20, 0);
-        /*var mixer = new THREE.AnimationMixer(gltf.scene);
-        var action = mixer.clipAction(gltf.animations[0]);
-        action.play();*/
+        gltf.scene.scale.set(0.3, 0.3, 0.3);
+        gltf.scene.position.set(0, 100, -100);
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
+  loader.load('models/house/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.position.set(0, 200, 0);
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
+  loader.load('models/rock/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.scale.set(3.0, 3.0, 3.0);
+        gltf.scene.position.set(100, 200, 0);
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
+  loader.load('models/tree/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.scale.set(0.1, 0.1, 0.1);
+        gltf.scene.position.set(200, 200, 0);
       }
     });
     //add the 3dObject to the mesh
