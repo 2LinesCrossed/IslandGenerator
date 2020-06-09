@@ -145,8 +145,6 @@ export function initialiseScene() {
 
   // Add event listeners
   window.addEventListener('resize', onWindowResize);
-
-  console.log(terrain.geometry.attributes.position);
 }
 
 //cloud
@@ -188,7 +186,7 @@ function createStar() {
     }
   }
 }
-// Models q
+// 3d Models
 function loadModels() {
   //loader
   var loader = new GLTFLoader();
