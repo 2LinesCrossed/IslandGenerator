@@ -28,6 +28,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.maxDistance = 4000.0;
 
 const water = createWater();
 
@@ -153,11 +154,7 @@ function createCloud() {
   });
   for (let p = 0; p < 8; p++) {
     let cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    cloud.position.set(
-      -1000 + p * 300,
-      1500,
-      Math.random() * 1700 - 400
-    );
+    cloud.position.set(-1000 + p * 300, 1500, Math.random() * 1700 - 400);
     cloud.rotation.x = 1.16;
     cloud.rotation.y = -0.12;
     cloud.rotation.z = Math.random() * 2 * Math.PI;
@@ -177,11 +174,7 @@ function createStar() {
   if (star) {
     for (let p = 0; p < 9; p++) {
       let star = new THREE.Mesh(starGeometry, starMaterial);
-      star.position.set(
-        Math.random() * 1700 - 400,
-        2000,
-        -1000 + p * 300
-      );
+      star.position.set(Math.random() * 1700 - 400, 2000, -1000 + p * 300);
       star.rotation.x = 1.16;
       star.rotation.y = -0.12;
       star.rotation.z = Math.random() * 2 * Math.PI;
@@ -222,11 +215,10 @@ export function update() {
     //  createStar();
 
     //}
-
   }
 
-  //update cloud 
-  cloudParticles.forEach(p => {
+  //update cloud
+  cloudParticles.forEach((p) => {
     p.rotation.z -= 0.002;
   });
   //update star
