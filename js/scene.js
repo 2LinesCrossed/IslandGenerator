@@ -203,19 +203,28 @@ function loadModels() {
   // add geo to scene
   scene.add(box_mesh);
   // instantiate a 3dObject
-
-  loader.load('models/dragon/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.scale.set(0.3, 0.3, 0.3);
-        gltf.scene.position.set(0, 100, -100);
+  var array = terrain.geometry.attributes.position.array;
+  var holder;
+  for (holder = 0; holder < array.length; holder++) {
+    if (holder % 4 == 1) {
+      if (array[holder] == 2000) {
+        for (var z = 0; z < 10; z++) {
+          loader.load('models/dragon/scene.gltf', function (gltf) {
+            gltf.scene.traverse((object) => {
+              if (object.isMesh) {
+                object.castShadow = true;
+                object.receiveShadow = true;
+                gltf.scene.scale.set(0.3, 0.3 + z, 0.3);
+                gltf.scene.position.set(0, 100, -100);
+              }
+            });
+            //add the 3dObject to the mesh
+            box_mesh.add(gltf.scene);
+          });
+        }
       }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
+    }
+  }
   loader.load('models/house/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
       if (object.isMesh) {
