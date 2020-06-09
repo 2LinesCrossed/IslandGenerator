@@ -30,7 +30,7 @@ buildGUI((gui, folders) => {
 });
 
 export function generateTerrain() {
-  var geometry = new THREE.PlaneBufferGeometry(2000, 2000, 256, 256);
+  var geometry = new THREE.PlaneBufferGeometry(4000, 4000, 256, 256);
   var material = new THREE.MeshPhysicalMaterial({ color: 0x356932 });
 
   var terrain = new THREE.Mesh(geometry, material);
