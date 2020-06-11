@@ -203,19 +203,47 @@ function loadModels() {
   // add geo to scene
   scene.add(box_mesh);
   // instantiate a 3dObject
+  var array = terrain.geometry.attributes.position.array;
+  var holder;
+  var holdNum = 0;
+  var randYArray = [];
+  console.log(terrain.geometry.attributes.position);
+  for (var randCounter = 0; randCounter < 10; ) {
+    var randNum = Math.floor(Math.random() * 256) + 1;
+    if (randYArray.includes(randNum)) {
+    } else {
+      randYArray.push(randNum);
+      randCounter++;
+    }
+  }
+  console.log(randYArray);
 
-  loader.load('models/dragon/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.scale.set(0.3, 0.3, 0.3);
-        gltf.scene.position.set(0, 100, -100);
+  for (holder = 0; holder < array.length; holder += 3) {
+    if (array[holder + 1] == 2000) {
+      holdNum++;
+      if (randYArray.includes(holdNum)) {
+        console.log(array[holder], array[holder + 1], array[holder + 2]);
+
+        loader.load('models/dragon/scene.gltf', function (gltf) {
+          gltf.scene.traverse((object) => {
+            if (object.isMesh) {
+              object.castShadow = true;
+              object.receiveShadow = true;
+              gltf.scene.scale.set(0.3, 0.3, 0.3);
+              gltf.scene.position.set(
+                Math.floor(array[holder] / 10),
+                Math.floor(array[holder + 1] / 10),
+                Math.floor(array[holder + 20] / 10)
+              );
+            }
+          });
+          //add the 3dObject to the mesh
+          box_mesh.add(gltf.scene);
+        });
       }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
+    }
+  }
+
   loader.load('models/house/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
       if (object.isMesh) {
