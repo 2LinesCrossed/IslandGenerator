@@ -204,7 +204,7 @@ function loadModels() {
   scene.add(box_mesh);
   // instantiate a 3dObject
   var array = terrain.geometry.attributes.position.array;
-  var holder;
+  var holder = 0;
   var holdNum = 0;
   var randYArray = [];
   console.log(terrain.geometry.attributes.position);
@@ -223,6 +223,11 @@ function loadModels() {
       holdNum++;
       if (randYArray.includes(holdNum)) {
         console.log(array[holder], array[holder + 1], array[holder + 2]);
+        const pos = [
+          array[holder],
+          array[holder + 1] / 10,
+          array[holder + 2] * 10
+        ];
 
         loader.load('models/dragon/scene.gltf', function (gltf) {
           gltf.scene.traverse((object) => {
@@ -230,11 +235,7 @@ function loadModels() {
               object.castShadow = true;
               object.receiveShadow = true;
               gltf.scene.scale.set(0.3, 0.3, 0.3);
-              gltf.scene.position.set(
-                Math.floor(array[holder] / 10),
-                Math.floor(array[holder + 1] / 10),
-                Math.floor(array[holder + 20] / 10)
-              );
+              gltf.scene.position.set(pos[2], pos[1], pos[0]);
             }
           });
           //add the 3dObject to the mesh
