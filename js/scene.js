@@ -28,6 +28,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.maxDistance = 4000.0;
 
 const water = createWater();
 
