@@ -1,6 +1,6 @@
 import * as THREE from './lib/three.js';
 import { OrbitControls } from './lib/orbitControls.js';
-
+import { GLTFLoader } from './lib/GLTFLoader.js';
 import { buildGUI } from './gui.js';
 import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
@@ -28,7 +28,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.maxDistance = 4000.0;
+controls.maxDistance = 2700.0;
 
 const water = createWater();
 
@@ -128,6 +128,9 @@ export function initialiseScene() {
   terrain = generateTerrain();
   scene.add(terrain);
 
+  //load 3D Models
+  loadModels();
+
   // Water
   scene.add(water);
 
@@ -183,6 +186,101 @@ function createStar() {
       scene.add(star);
     }
   }
+}
+// 3d Models
+function loadModels() {
+  //loader
+  var loader = new GLTFLoader();
+  // create material of geo
+  var material_cube = new THREE.MeshLambertMaterial();
+  // wireframe
+  material_cube.wireframe = false;
+  // create box geo
+  var geo_cube = new THREE.BoxGeometry(5, 0.1, 5);
+  // create box mesh
+  var box_mesh = new THREE.Mesh(geo_cube, material_cube);
+  box_mesh.castShadow = true;
+  box_mesh.receiveShadow = true;
+  // add geo to scene
+  scene.add(box_mesh);
+  // instantiate a 3dObject
+  var array = terrain.geometry.attributes.position.array;
+  var holder = 0;
+  var holdNum = 0;
+  var randYArray = [];
+  console.log(terrain.geometry.attributes.position);
+  for (var randCounter = 0; randCounter < 10; ) {
+    var randNum = Math.floor(Math.random() * 256) + 1;
+    if (randYArray.includes(randNum)) {
+    } else {
+      randYArray.push(randNum);
+      randCounter++;
+    }
+  }
+  console.log(randYArray);
+
+  for (holder = 0; holder < array.length; holder += 3) {
+    if (array[holder + 1] == 2000) {
+      holdNum++;
+      if (randYArray.includes(holdNum)) {
+        console.log(array[holder], array[holder + 1], array[holder + 2]);
+        const pos = [
+          array[holder],
+          array[holder + 1] / 10,
+          array[holder + 2] * 10
+        ];
+
+        loader.load('models/dragon/scene.gltf', function (gltf) {
+          gltf.scene.traverse((object) => {
+            if (object.isMesh) {
+              object.castShadow = true;
+              object.receiveShadow = true;
+              gltf.scene.scale.set(0.3, 0.3, 0.3);
+              gltf.scene.position.set(pos[2], pos[1], pos[0]);
+            }
+          });
+          //add the 3dObject to the mesh
+          box_mesh.add(gltf.scene);
+        });
+      }
+    }
+  }
+
+  loader.load('models/house/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.position.set(0, 200, 0);
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
+  loader.load('models/rock/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.scale.set(3.0, 3.0, 3.0);
+        gltf.scene.position.set(100, 200, 0);
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
+  loader.load('models/tree/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.scale.set(0.1, 0.1, 0.1);
+        gltf.scene.position.set(200, 200, 0);
+      }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+  });
 }
 
 function onWindowResize() {

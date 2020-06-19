@@ -97,7 +97,7 @@ export function createWater() {
     waterObj.shader = shader;
   };
   const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(2000, 2000, 100, 100),
+    new THREE.PlaneBufferGeometry(4000, 4000, 100, 100),
     material
   );
 

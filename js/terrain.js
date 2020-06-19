@@ -4,8 +4,8 @@ import { buildGUI } from './gui.js';
 import * as scene from './scene.js';
 
 var peak = 200;
-var smoothing = 600;
-var myseed = Math.floor(1000 * Math.random());
+var smoothing = 1400;
+export var myseed = Math.floor(1000 * Math.random());
 
 buildGUI((gui, folders) => {
   var params = {
@@ -23,16 +23,71 @@ buildGUI((gui, folders) => {
     myseed = val;
     updateTerrain();
   });
-  folders.terrain.add(params, 'smoothvalue', 1, 1000).onChange(function (val) {
+  folders.terrain.add(params, 'smoothvalue', 1, 2000).onChange(function (val) {
     smoothing = val;
     updateTerrain();
   });
 });
 
 export function generateTerrain() {
-  var geometry = new THREE.PlaneBufferGeometry(2000, 2000, 256, 256);
-  var material = new THREE.MeshPhysicalMaterial({ color: 0x356932 });
+  var geometry = new THREE.PlaneBufferGeometry(4000, 4000, 256, 256);
+  var material = new THREE.MeshPhysicalMaterial();
 
+  material.onBeforeCompile = (shader) => {
+    // Vertex Shader
+
+    shader.vertexShader = shader.vertexShader.replace(
+      `#include <common>`,
+      `
+        #include <common>
+        varying float y;
+        `
+    );
+    shader.vertexShader = shader.vertexShader.replace(
+      `#include <begin_vertex>`,
+      `
+        #include <begin_vertex>
+        y = ( position.z + 0.1 ) * 5.0;
+        `
+    );
+
+    console.log(shader.vertexShader);
+
+    // Fragment Shader
+
+    shader.fragmentShader = shader.fragmentShader.replace(
+      `#include <common>`,
+      `
+        #include <common>
+        varying float y;
+        vec3 col;
+        `
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
+      `
+        if (y <= 160.0) {
+          col = vec3 ((235.0 / 255.0), (233.0 / 255.0), (90.0 / 255.0));
+        }
+        if (y > 160.0 && y < 330.0){
+          col = vec3 ((100.0 / 255.0), (120.0 / 255.0), (60.0 / 255.0));
+        }
+        if (y >= 330.0 && y < 600.0) {
+          col = vec3 ((100.0 / 255.0), (160.0 / 255.0), (60.0 / 255.0));
+        }
+        if (y >= 600.0 && y < 880.0) {
+          col = vec3 ((180.0 / 255.0), (180.0 / 255.0), (180.0 / 255.0));
+        }
+        if (y >= 880.0) {
+          col = vec3 ((230.0 / 255.0), (230.0 / 255.0), (180.0 / 255.0));
+        }
+        outgoingLight *= col;
+        gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+        `
+    );
+
+    console.log(shader.fragmentShader);
+  };
   var terrain = new THREE.Mesh(geometry, material);
   terrain.rotation.x = -Math.PI / 2;
   terrain.geometry.attributes.position.needsUpdate = true;
@@ -45,19 +100,16 @@ export function generateTerrain() {
   for (var i = 0; i <= vertices.length; i += 3) {
     vertices[i + 2] =
       peak * perlin.noise(vertices[i] / smoothing, vertices[i + 1] / smoothing);
-    peak *
+    vertices[i + 2] +=
+      peak *
       0.5 *
       perlin.noise(
-        (vertices[i] * 10) / smoothing,
-        (vertices[i + 1] * 10) / smoothing
+        (vertices[i] * 5) / smoothing,
+        (vertices[i + 1] * 5) / smoothing
       );
-    peak *
-      2 *
-      perlin.noise(
-        (vertices[i] * 5) / (smoothing / 100),
-        (vertices[i + 3] * 5) / (smoothing / 100)
-      );
+    //vertices[i + 2] += peak * 0.25 * perlin.noise((vertices[i] * 4) / (smoothing),(vertices[i + 3] * 4) / (smoothing))
   }
+
   terrain.geometry.attributes.position.needsUpdate = true;
   terrain.geometry.computeVertexNormals();
   return terrain;
