@@ -31,7 +31,24 @@ buildGUI((gui, folders) => {
 
 export function generateTerrain() {
   var geometry = new THREE.PlaneBufferGeometry(4000, 4000, 256, 256);
-  var material = new THREE.MeshPhysicalMaterial();
+
+  const tileAmt = 10;
+  const normals = THREE.ImageUtils.loadTexture('./textures/sand2.jpg');
+  normals.wrapS = THREE.RepeatWrapping;
+  normals.wrapT = THREE.RepeatWrapping;
+  normals.repeat.set(tileAmt, tileAmt);
+
+  var material = new THREE.MeshPhysicalMaterial({
+    normalMap: normals,
+    normalScale: new THREE.Vector2(0.1, 0.01),
+    roughness: 0.7,
+    clearcoatNormalMap: normals,
+    clearcoatNormalScale: new THREE.Vector2(0.9, 1),
+    clearcoatRoughness: 0.56,
+    clearcoat: 0.4,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.1
+  });
 
   material.onBeforeCompile = (shader) => {
     // Vertex Shader
@@ -50,8 +67,6 @@ export function generateTerrain() {
         y = ( position.z + 0.1 ) * 5.0;
         `
     );
-
-    console.log(shader.vertexShader);
 
     // Fragment Shader
 
@@ -85,8 +100,6 @@ export function generateTerrain() {
         gl_FragColor = vec4( outgoingLight, diffuseColor.a );
         `
     );
-
-    console.log(shader.fragmentShader);
   };
   var terrain = new THREE.Mesh(geometry, material);
   terrain.rotation.x = -Math.PI / 2;
