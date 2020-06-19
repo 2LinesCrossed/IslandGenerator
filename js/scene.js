@@ -28,7 +28,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.maxDistance = 2700.0;
+controls.maxDistance = 12700.0;
 
 const water = createWater();
 
@@ -79,8 +79,8 @@ buildGUI((gui, folders) => {
 
 export function initialiseScene() {
   // Set camera pos
-  camera.position.y = 70;
-  camera.position.z = 1000;
+  camera.position.y = 2000;
+  camera.position.z = 5000;
   camera.rotation.x = (-15 * Math.PI) / 180;
 
   // Renderer settings
@@ -208,7 +208,6 @@ function loadModels() {
   var holder = 0;
   var holdNum = 0;
   var randYArray = [];
-  console.log(terrain.geometry.attributes.position);
   for (var randCounter = 0; randCounter < 10; ) {
     var randNum = Math.floor(Math.random() * 256) + 1;
     if (randYArray.includes(randNum)) {
