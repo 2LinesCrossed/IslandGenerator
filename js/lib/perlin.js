@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
 //credit: https://gist.github.com/banksean/304522#file-perlin-noise-simplex-js
+import { myseed } from '../terrain.js';
 
 export class Perlin {
   constructor() {
