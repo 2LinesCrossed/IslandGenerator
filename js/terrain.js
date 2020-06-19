@@ -4,7 +4,7 @@ import { buildGUI } from './gui.js';
 import * as scene from './scene.js';
 
 var peak = 200;
-var smoothing = 600;
+var smoothing = 800;
 export var myseed = Math.floor(1000 * Math.random());
 
 buildGUI((gui, folders) => {
@@ -66,14 +66,20 @@ export function generateTerrain() {
     shader.fragmentShader = shader.fragmentShader.replace(
       `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
       `
-        if (y <= 10.0) {
-          col = vec3 ((250.0 / 255.0), (234.0 / 255.0), (164.0 / 255.0));
+        if (y <= 60.0) {
+          col = vec3 ((235.0 / 255.0), (233.0 / 255.0), (90.0 / 255.0));
         }
-        if (y > 60.0) {
-          col = vec3 (0.235, 0.702, 0.443);
+        if (y >= 400.0 && y < 580.0) {
+          col = vec3 ((180.0 / 255.0), (180.0 / 255.0), (180.0 / 255.0));
         }
-        if (y > 10.0 && y < 60.0){
-          col = vec3 (0.100, 0.702, 0.443);
+        if (y >= 580.0) {
+          col = vec3 ((230.0 / 255.0), (230.0 / 255.0), (180.0 / 255.0));
+        }
+        if (y >= 230.0 && y < 400.0) {
+          col = vec3 ((100.0 / 255.0), (160.0 / 255.0), (60.0 / 255.0));
+        }
+        if (y > 60.0 && y < 230.0){
+          col = vec3 ((100.0 / 255.0), (120.0 / 255.0), (60.0 / 255.0));
         }
         outgoingLight *= col;
         gl_FragColor = vec4( outgoingLight, diffuseColor.a );
@@ -94,18 +100,14 @@ export function generateTerrain() {
   for (var i = 0; i <= vertices.length; i += 3) {
     vertices[i + 2] =
       peak * perlin.noise(vertices[i] / smoothing, vertices[i + 1] / smoothing);
-    peak *
+    vertices[i + 2] +=
+      peak *
       0.5 *
       perlin.noise(
-        (vertices[i] * 10) / smoothing,
-        (vertices[i + 1] * 10) / smoothing
+        (vertices[i] * 5) / smoothing,
+        (vertices[i + 1] * 5) / smoothing
       );
-    peak *
-      2 *
-      perlin.noise(
-        (vertices[i] * 5) / (smoothing / 100),
-        (vertices[i + 3] * 5) / (smoothing / 100)
-      );
+    //vertices[i + 2] += peak * 0.25 * perlin.noise((vertices[i] * 4) / (smoothing),(vertices[i + 3] * 4) / (smoothing))
   }
 
   terrain.geometry.attributes.position.needsUpdate = true;
