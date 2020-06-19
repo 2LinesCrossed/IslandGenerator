@@ -57,7 +57,7 @@ export function createWater() {
     clearcoatRoughness: 0.01,
     transparent: true,
     roughness: 0.01,
-    transparency: 0.2,
+    transparency: 0.23,
     reflectivity: 1.7
   });
 

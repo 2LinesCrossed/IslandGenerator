@@ -12,7 +12,7 @@ export const reflectionRenderTarget = new THREE.WebGLCubeRenderTarget(
   defaultReflectionSize
 );
 
-const cubeCamera = new THREE.CubeCamera(0.001, 1500, reflectionRenderTarget);
+const cubeCamera = new THREE.CubeCamera(0.001, 2000, reflectionRenderTarget);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
@@ -244,17 +244,17 @@ function loadModels() {
     }
   }
 
-  loader.load('models/house/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.position.set(0, 200, 0);
-      }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
+  // loader.load('models/house/scene.gltf', function (gltf) {
+  //   gltf.scene.traverse((object) => {
+  //     if (object.isMesh) {
+  //       object.castShadow = true;
+  //       object.receiveShadow = true;
+  //       gltf.scene.position.set(0, 200, 0);
+  //     }
+  //   });
+  //   //add the 3dObject to the mesh
+  //   box_mesh.add(gltf.scene);
+  // });
   loader.load('models/rock/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
       if (object.isMesh) {
