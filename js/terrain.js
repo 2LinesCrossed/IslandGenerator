@@ -4,7 +4,7 @@ import { buildGUI } from './gui.js';
 import * as scene from './scene.js';
 
 var peak = 200;
-var smoothing = 800;
+var smoothing = 1400;
 export var myseed = Math.floor(1000 * Math.random());
 
 buildGUI((gui, folders) => {
@@ -23,7 +23,7 @@ buildGUI((gui, folders) => {
     myseed = val;
     updateTerrain();
   });
-  folders.terrain.add(params, 'smoothvalue', 1, 1000).onChange(function (val) {
+  folders.terrain.add(params, 'smoothvalue', 1, 2000).onChange(function (val) {
     smoothing = val;
     updateTerrain();
   });
@@ -66,20 +66,20 @@ export function generateTerrain() {
     shader.fragmentShader = shader.fragmentShader.replace(
       `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
       `
-        if (y <= 60.0) {
+        if (y <= 160.0) {
           col = vec3 ((235.0 / 255.0), (233.0 / 255.0), (90.0 / 255.0));
         }
-        if (y >= 400.0 && y < 580.0) {
-          col = vec3 ((180.0 / 255.0), (180.0 / 255.0), (180.0 / 255.0));
+        if (y > 160.0 && y < 330.0){
+          col = vec3 ((100.0 / 255.0), (120.0 / 255.0), (60.0 / 255.0));
         }
-        if (y >= 580.0) {
-          col = vec3 ((230.0 / 255.0), (230.0 / 255.0), (180.0 / 255.0));
-        }
-        if (y >= 230.0 && y < 400.0) {
+        if (y >= 330.0 && y < 600.0) {
           col = vec3 ((100.0 / 255.0), (160.0 / 255.0), (60.0 / 255.0));
         }
-        if (y > 60.0 && y < 230.0){
-          col = vec3 ((100.0 / 255.0), (120.0 / 255.0), (60.0 / 255.0));
+        if (y >= 600.0 && y < 880.0) {
+          col = vec3 ((180.0 / 255.0), (180.0 / 255.0), (180.0 / 255.0));
+        }
+        if (y >= 880.0) {
+          col = vec3 ((230.0 / 255.0), (230.0 / 255.0), (180.0 / 255.0));
         }
         outgoingLight *= col;
         gl_FragColor = vec4( outgoingLight, diffuseColor.a );
