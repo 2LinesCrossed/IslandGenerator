@@ -3,17 +3,29 @@ import { Perlin } from './lib/perlin.js';
 import { buildGUI } from './gui.js';
 import * as scene from './scene.js';
 
-var peak = 350;
-var smoothing = 70;
+var peak = 400;
+var smoothing = 100;
 export var myseed = Math.floor(1000 * Math.random());
-var freq = 5;
+var freq = 40;
+var terrace = 1;
+var flatshader = 1;
+var colorInterval = 160.0;
+var colorArr = [
+  [235, 233, 90],
+  [100, 120, 60],
+  [100, 160, 60],
+  [180, 180, 180],
+  [230, 230, 180]
+];
 
 buildGUI((gui, folders) => {
   var params = {
     hillpeak: peak,
     randomseed: myseed,
     smoothvalue: smoothing,
-    frequency: freq
+    frequency: freq,
+    terrace: terrace,
+    flatshader: flatshader
   };
 
   folders.terrain.add(params, 'hillpeak', 0, 1000).onChange(function (val) {
@@ -25,12 +37,20 @@ buildGUI((gui, folders) => {
     myseed = val;
     updateTerrain();
   });
-  folders.terrain.add(params, 'smoothvalue', 1, 100).onChange(function (val) {
+  folders.terrain.add(params, 'smoothvalue', 1, 200).onChange(function (val) {
     smoothing = val;
     updateTerrain();
   });
-  folders.terrain.add(params, 'frequency', 1, 10).onChange(function (val) {
+  folders.terrain.add(params, 'frequency', 1, 100).onChange(function (val) {
     freq = val;
+    updateTerrain();
+  });
+  folders.terrain.add(params, 'terrace', 1, 100).onChange(function (val) {
+    terrace = val;
+    updateTerrain();
+  });
+  folders.terrain.add(params, 'flatshader', 0, 1).onChange(function (val) {
+    flatshader = val;
     updateTerrain();
   });
 });
@@ -38,7 +58,8 @@ buildGUI((gui, folders) => {
 export function generateTerrain() {
   var geometry = new THREE.PlaneBufferGeometry(4000, 4000, 256, 256);
 
-  var material = new THREE.MeshPhysicalMaterial();
+  var fs = Math.round(flatshader) == 1 ? true : false;
+  var material = new THREE.MeshPhongMaterial({ flatShading: fs });
 
   material.onBeforeCompile = (shader) => {
     // Vertex Shader
@@ -68,28 +89,43 @@ export function generateTerrain() {
         vec3 col;
         `
     );
+
     shader.fragmentShader = shader.fragmentShader.replace(
       `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
       `
-        if (y <= 160.0) {
-          col = vec3 ((235.0 / 255.0), (233.0 / 255.0), (90.0 / 255.0));
-        }
-        if (y > 160.0 && y < 330.0){
-          col = vec3 ((100.0 / 255.0), (120.0 / 255.0), (60.0 / 255.0));
-        }
-        if (y >= 330.0 && y < 600.0) {
-          col = vec3 ((100.0 / 255.0), (160.0 / 255.0), (60.0 / 255.0));
-        }
-        if (y >= 600.0 && y < 880.0) {
-          col = vec3 ((180.0 / 255.0), (180.0 / 255.0), (180.0 / 255.0));
-        }
-        if (y >= 880.0) {
-          col = vec3 ((230.0 / 255.0), (230.0 / 255.0), (180.0 / 255.0));
-        }
+        ${colorInt(colorInterval, colorArr)}
         outgoingLight *= col;
         gl_FragColor = vec4( outgoingLight, diffuseColor.a );
         `
     );
+  };
+
+  var colorLevel = function (color) {
+    return `col = vec3 ((${color[0]}.0 / 255.0), (${color[1]}.0 / 255.0), (${color[2]}.0 / 255.0));`;
+  };
+
+  var colorInt = function (interval, colorArray) {
+    let s = ``;
+
+    for (var i = 0; i < colorArray.length; i++) {
+      if (i == 0) {
+        s += `if (y <= ${interval}.0){
+            ${colorLevel(colorArray[i])}
+          }
+          `;
+      } else if (i == colorArray.length - 1) {
+        s += `if (y > ${i * interval}.0){
+            ${colorLevel(colorArray[i])}
+          }
+          `;
+      } else {
+        s += `if (y > ${i * interval}.0 && y < ${i * interval + interval}.0 ){
+            ${colorLevel(colorArray[i])}
+          }
+          `;
+      }
+    }
+    return s;
   };
 
   var terrain = new THREE.Mesh(geometry, material);
@@ -120,7 +156,8 @@ export function generateTerrain() {
       vertdiv2 = v2;
       itt += 1;
     }
-    vertices[i + 2] = peak * vert;
+
+    vertices[i + 2] = Math.ceil((peak * vert) / terrace) * terrace;
   }
 
   terrain.geometry.attributes.position.needsUpdate = true;

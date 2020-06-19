@@ -228,7 +228,7 @@ function loadModels() {
           array[holder + 1] / 10,
           array[holder + 2] * 10
         ];
-
+        /*
         loader.load('models/dragon/scene.gltf', function (gltf) {
           gltf.scene.traverse((object) => {
             if (object.isMesh) {
@@ -240,12 +240,12 @@ function loadModels() {
           });
           //add the 3dObject to the mesh
           box_mesh.add(gltf.scene);
-        });
+        });*/
       }
     }
   }
 
-  loader.load('models/house/scene.gltf', function (gltf) {
+  /*loader.load('models/house/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
       if (object.isMesh) {
         object.castShadow = true;
@@ -279,7 +279,7 @@ function loadModels() {
     });
     //add the 3dObject to the mesh
     box_mesh.add(gltf.scene);
-  });
+  });*/
 }
 
 function onWindowResize() {
