@@ -51,8 +51,6 @@ export function generateTerrain() {
         `
     );
 
-    console.log(shader.vertexShader);
-
     // Fragment Shader
 
     shader.fragmentShader = shader.fragmentShader.replace(
@@ -85,8 +83,6 @@ export function generateTerrain() {
         gl_FragColor = vec4( outgoingLight, diffuseColor.a );
         `
     );
-
-    console.log(shader.fragmentShader);
   };
   var terrain = new THREE.Mesh(geometry, material);
   terrain.rotation.x = -Math.PI / 2;
