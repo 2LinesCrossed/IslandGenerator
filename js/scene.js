@@ -16,6 +16,8 @@ const cubeCamera = new THREE.CubeCamera(0.001, 15000, reflectionRenderTarget);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
+var clock = new THREE.Clock();
+var mixer;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -203,48 +205,23 @@ function loadModels() {
   box_mesh.receiveShadow = true;
   // add geo to scene
   scene.add(box_mesh);
-  // instantiate a 3dObject
-  var array = terrain.geometry.attributes.position.array;
-  var holder = 0;
-  var holdNum = 0;
-  var randYArray = [];
-  console.log(terrain.geometry.attributes.position);
-  for (var randCounter = 0; randCounter < 10; ) {
-    var randNum = Math.floor(Math.random() * 256) + 1;
-    if (randYArray.includes(randNum)) {
-    } else {
-      randYArray.push(randNum);
-      randCounter++;
-    }
-  }
-  console.log(randYArray);
-
-  for (holder = 0; holder < array.length; holder += 3) {
-    if (array[holder + 1] == 2000) {
-      holdNum++;
-      if (randYArray.includes(holdNum)) {
-        console.log(array[holder], array[holder + 1], array[holder + 2]);
-        const pos = [
-          array[holder],
-          array[holder + 1] / 10,
-          array[holder + 2] * 10
-        ];
-
-        loader.load('models/dragon/scene.gltf', function (gltf) {
-          gltf.scene.traverse((object) => {
-            if (object.isMesh) {
-              object.castShadow = true;
-              object.receiveShadow = true;
-              gltf.scene.scale.set(0.3, 0.3, 0.3);
-              gltf.scene.position.set(pos[2], pos[1], pos[0]);
-            }
-          });
-          //add the 3dObject to the mesh
-          box_mesh.add(gltf.scene);
-        });
+  loader.load('/models/dragon/scene.gltf', function (gltf) {
+    gltf.scene.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        gltf.scene.scale.set(1, 1, 1);
+        gltf.scene.position.set(0, 200, 100);
       }
-    }
-  }
+    });
+    //add the 3dObject to the mesh
+    box_mesh.add(gltf.scene);
+    mixer = new THREE.AnimationMixer(gltf.scene);
+
+    gltf.animations.forEach((clip) => {
+      mixer.clipAction(clip).play();
+    });
+  });
 
   loader.load('models/house/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
@@ -300,6 +277,11 @@ function onWindowResize() {
 }
 
 export function update() {
+  requestAnimationFrame(update);
+
+  var delta = clock.getDelta();
+
+  if (mixer) mixer.update(delta);
   // Update sun
   sun.position.set(...sunPos);
   directionalLight.position.set(...sunPos).normalize();
