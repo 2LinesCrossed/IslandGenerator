@@ -30,7 +30,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.maxDistance = 2700.0;
+controls.maxDistance = 4500.0;
 
 const water = createWater();
 
@@ -53,7 +53,7 @@ var visibilityDragon = [],
   visibilityRobot = [];
 var dragon = false,
   phoenix = false,
-  robot = false,
+  robot = true,
   balerion = false;
 
 buildGUI((gui, folders) => {
@@ -164,7 +164,7 @@ export function initialiseScene() {
   //load 3D Models
   //loader
   const gltfLoader = new GLTFLoader();
-  //Dragon
+  //Dragon by RedCoreTimber Sketchfab
   //load model Asynchronus
   gltfLoader.load('/models/dragon/scene.gltf', (gltf) => {
     //set const to avoid calling gltf.scene multiple times
@@ -188,7 +188,7 @@ export function initialiseScene() {
       mixer0.clipAction(clip).play();
     });
   });
-  //Phoenix
+  //Phoenix by Sketchfab
   //load model Asynchronus
   gltfLoader.load('/models/phoenix/scene.gltf', (gltf) => {
     const root = gltf.scene;
@@ -211,7 +211,7 @@ export function initialiseScene() {
       mixer1.clipAction(clip).play();
     });
   });
-  //Balerion from Game of Thrones
+  //Balerion from Game of Thrones by Anthony Yanez Sketchfab
   //load model Asynchronus
   gltfLoader.load('/models/balerion/scene.gltf', (gltf) => {
     const root = gltf.scene;
@@ -226,7 +226,7 @@ export function initialiseScene() {
     // push to array to change in GUI
     visibilityBalerion.push(gltf.scene);
     //visibility
-    root.visible = dragon;
+    root.visible = balerion;
     //Animation Mixer var
     mixer2 = new THREE.AnimationMixer(root);
     // play animation
@@ -234,7 +234,7 @@ export function initialiseScene() {
       mixer2.clipAction(clip).play();
     });
   });
-  //Robot
+  //Robot by Wakarma sketchfab
   //load model Asynchronus
   gltfLoader.load('/models/robot/scene.gltf', (gltf) => {
     const root = gltf.scene;
@@ -243,14 +243,14 @@ export function initialiseScene() {
     //scale scene
     root.scale.set(1, 1, 1);
     //set position
-    root.position.set(0, 1500, 2500);
+    root.position.set(0, 2500, 3500);
     //set rotation
     root.rotation.y += 4.8;
     root.rotation.x -= 0.5;
     //push to array to change in GUI
     visibilityRobot.push(gltf.scene);
     //visibility
-    root.visible = dragon;
+    root.visible = robot;
     //Animation mixer Var
     mixer3 = new THREE.AnimationMixer(root);
     // play animation
