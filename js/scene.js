@@ -349,7 +349,7 @@ export function update() {
   }
 
   //update cloud
-  sky.position.y -= 0.0002;
+  sky.rotation.y -= 0.0003;
   // Animate water
   updateWater(lastRenderTime);
 
