@@ -167,9 +167,9 @@ export function initialiseScene() {
     //add to scene
     scene.add(root);
     //scale scene
-    root.scale.set(24, 24, 24);
+    root.scale.set(45, 45, 45);
     //set position
-    root.position.set(-1500, 700, 0);
+    root.position.set(-3000, 700, 0);
     //set rotation
     root.rotation.y += 1.65;
     //push to array to change values from GUI
@@ -190,11 +190,11 @@ export function initialiseScene() {
     // add to scene
     scene.add(root);
     // scale scene
-    root.scale.set(2, 2, 2);
+    root.scale.set(3, 3, 3);
     // set position
-    root.position.set(1500, 700, 0);
+    root.position.set(3000, 700, 0);
     // set rotation
-    root.rotation.y += 3.1;
+    root.rotation.y += 2.7;
     // push to array to change in GUI
     visibilityPhoenix.push(gltf.scene);
     // visibility
@@ -213,7 +213,7 @@ export function initialiseScene() {
     //add to scene
     scene.add(root);
     //scale scene
-    root.scale.set(0.3, 0.3, 0.3);
+    root.scale.set(2, 2, 2);
     // set position
     root.position.set(0, 700, -6000);
     // set rotation
