@@ -147,8 +147,6 @@ export function initialiseScene() {
   sun = new THREE.Mesh(sphereGeometry, sphereMaterial);
   scene.add(sun);
 
-
-
   // Directional light
   directionalLight = new THREE.DirectionalLight(0xffffff, sunIntensity);
   directionalLight.castShadow = true;
@@ -345,7 +343,6 @@ export function update() {
   //Update day,night light and adding the cloud | star
   if (sun.position.y > 0) {
     hemiLight.intensity = sun.position.y * 0.0007;
-
   }
 
   //update cloud
