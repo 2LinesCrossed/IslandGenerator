@@ -131,7 +131,8 @@ export function initialiseScene() {
   scene.add(terrain);
 
   //load 3D Models
-  loadModels();
+  loadDragon();
+  loadPhoenix();
 
   // Water
   scene.add(water);
@@ -189,8 +190,9 @@ function createStar() {
     }
   }
 }
+
 // 3d Models
-function loadModels() {
+function loadDragon() {
   //loader
   var loader = new GLTFLoader();
   // create material of geo
@@ -205,58 +207,62 @@ function loadModels() {
   box_mesh.receiveShadow = true;
   // add geo to scene
   scene.add(box_mesh);
-  loader.load('/models/dragon/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
+  box_mesh.rotation.y += 4.7;
+  loader.load('/models/dragon/scene.gltf', function (dragon) {
+    dragon.scene.traverse((object) => {
       if (object.isMesh) {
         object.castShadow = true;
         object.receiveShadow = true;
-        gltf.scene.scale.set(1, 1, 1);
-        gltf.scene.position.set(0, 200, 100);
+        dragon.scene.scale.set(15, 15, 15);
+        dragon.scene.position.set(-1500, 700, 0);
+        dragon.scene.rotation.y += 1.65;
       }
     });
     //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-    mixer = new THREE.AnimationMixer(gltf.scene);
+    scene.add(dragon.scene);
 
-    gltf.animations.forEach((clip) => {
+    mixer = new THREE.AnimationMixer(dragon.scene);
+    // play animation
+    dragon.animations.forEach((clip) => {
       mixer.clipAction(clip).play();
     });
   });
+}
 
-  loader.load('models/house/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
+function loadPhoenix() {
+  //loader
+  var loader = new GLTFLoader();
+  // create material of geo
+  var material_cube = new THREE.MeshLambertMaterial();
+  // wireframe
+  material_cube.wireframe = false;
+  // create box geo
+  var geo_cube = new THREE.BoxGeometry(5, 0.1, 5);
+  // create box mesh
+  var box_mesh = new THREE.Mesh(geo_cube, material_cube);
+  box_mesh.castShadow = true;
+  box_mesh.receiveShadow = true;
+  // add geo to scene
+  scene.add(box_mesh);
+  box_mesh.rotation.y += 4.7;
+  loader.load('/models/phoenix/scene.gltf', function (phoenix) {
+    phoenix.scene.traverse((object) => {
       if (object.isMesh) {
         object.castShadow = true;
         object.receiveShadow = true;
-        gltf.scene.position.set(0, 200, 0);
+        phoenix.scene.scale.set(2, 2, 2);
+        phoenix.scene.position.set(1500, 700, 0);
+        phoenix.scene.rotation.y += 1.65;
       }
     });
     //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
-  loader.load('models/rock/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.scale.set(3.0, 3.0, 3.0);
-        gltf.scene.position.set(100, 200, 0);
-      }
+    scene.add(phoenix.scene);
+
+    mixer = new THREE.AnimationMixer(phoenix.scene);
+    // play animation
+    phoenix.animations.forEach((clip) => {
+      mixer.clipAction(clip).play();
     });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
-  loader.load('models/tree/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.scale.set(0.1, 0.1, 0.1);
-        gltf.scene.position.set(200, 200, 0);
-      }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
   });
 }
 
@@ -277,8 +283,6 @@ function onWindowResize() {
 }
 
 export function update() {
-  requestAnimationFrame(update);
-
   var delta = clock.getDelta();
 
   if (mixer) mixer.update(delta);
