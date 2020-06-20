@@ -51,10 +51,10 @@ var visibilityDragon = [],
   visibilityPhoenix = [],
   visibilityBalerion = [],
   visibilityRobot = [];
-var dragon = true,
-  phoenix = true,
-  robot = true,
-  balerion = true;
+var dragon = false,
+  phoenix = false,
+  robot = false,
+  balerion = false;
 
 buildGUI((gui, folders) => {
   const params = {
