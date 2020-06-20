@@ -3,13 +3,20 @@ import { Perlin } from './lib/perlin.js';
 import { buildGUI } from './gui.js';
 import * as scene from './scene.js';
 
+//Peak affects the maximum height of mountains. Has different effects depending on smoothing and frequency.
 var peak = 400;
+//Smoothing affects the distribution and size of the 'islands', ranging from archipelago to a zoomed in chunk of a landmass
 var smoothing = 100;
 export var myseed = Math.floor(1000 * Math.random());
+//Increasing frequency makes the mountains more varied and interesting. Decreasing flattens things out.
 var freq = 40;
+//Terracing option to make the landscape into layers.
 var terrace = 1;
+//Flattens specific vertices to create a 'polygonal' look.
 var flatshader = 1;
-var colorInterval = 160.0;
+//How long each of the colour bands are.
+var colorInterval = 250.0;
+//Colour array for storing the 'bands' of colour
 var colorArr = [
   [235, 233, 90],
   [100, 120, 60],
@@ -99,7 +106,7 @@ export function generateTerrain() {
         `
     );
   };
-
+  //Shader colour definition for each bands. It retrieves different GLSL vector 3 colours from the array.
   var colorLevel = function (color) {
     return `col = vec3 ((${color[0]}.0 / 255.0), (${color[1]}.0 / 255.0), (${color[2]}.0 / 255.0));`;
   };
@@ -136,7 +143,7 @@ export function generateTerrain() {
   //Change the peak value for different sizes.
   var perlin = new Perlin();
   var vertices = terrain.geometry.attributes.position.array;
-
+  //Algorithm for creating proper mountainous landscapes
   for (var i = 0; i <= vertices.length; i += 3) {
     let x = vertices[i];
     let y = vertices[i + 1];
