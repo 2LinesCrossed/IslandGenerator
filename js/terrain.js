@@ -18,11 +18,11 @@ var flatshader = 1;
 var colorInterval = 250.0;
 //Colour array for storing the 'bands' of colour
 var colorArr = [
-  [235, 233, 90],
-  [100, 120, 60],
-  [100, 160, 60],
-  [180, 180, 180],
-  [230, 230, 180]
+  [235, 233, 90, 160],
+  [100, 120, 60, 100],
+  [100, 160, 60, 350],
+  [180, 180, 180, 550],
+  [230, 230, 180, 300]
 ];
 
 buildGUI((gui, folders) => {
@@ -100,7 +100,7 @@ export function generateTerrain() {
     shader.fragmentShader = shader.fragmentShader.replace(
       `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
       `
-        ${colorInt(colorInterval, colorArr)}
+        ${colorInt(colorArr)}
         outgoingLight *= col;
         gl_FragColor = vec4( outgoingLight, diffuseColor.a );
         `
@@ -111,22 +111,24 @@ export function generateTerrain() {
     return `col = vec3 ((${color[0]}.0 / 255.0), (${color[1]}.0 / 255.0), (${color[2]}.0 / 255.0));`;
   };
 
-  var colorInt = function (interval, colorArray) {
+  var colorInt = function (colorArray) {
     let s = ``;
-
+    let vn = 0;
     for (var i = 0; i < colorArray.length; i++) {
+      vn += colorArray[i][3];
+      let vd = vn - colorArray[i][3];
       if (i == 0) {
-        s += `if (y <= ${interval}.0){
+        s += `if (y <= ${vn}.0){
             ${colorLevel(colorArray[i])}
           }
           `;
       } else if (i == colorArray.length - 1) {
-        s += `if (y > ${i * interval}.0){
+        s += `if (y > ${vd}.0){
             ${colorLevel(colorArray[i])}
           }
           `;
       } else {
-        s += `if (y > ${i * interval}.0 && y < ${i * interval + interval}.0 ){
+        s += `if (y > ${vd}.0 && y < ${vn}.0 ){
             ${colorLevel(colorArray[i])}
           }
           `;
