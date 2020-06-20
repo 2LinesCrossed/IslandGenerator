@@ -12,7 +12,7 @@ export const reflectionRenderTarget = new THREE.WebGLCubeRenderTarget(
   defaultReflectionSize
 );
 
-const cubeCamera = new THREE.CubeCamera(0.001, 15000, reflectionRenderTarget);
+const cubeCamera = new THREE.CubeCamera(0.001, 2000, reflectionRenderTarget);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
@@ -28,7 +28,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer();
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.maxDistance = 4000.0;
+controls.maxDistance = 2700.0;
 
 const water = createWater();
 
@@ -208,7 +208,7 @@ function loadModels() {
   var holder = 0;
   var holdNum = 0;
   var randYArray = [];
-  console.log(terrain.geometry.attributes.position);
+
   for (var randCounter = 0; randCounter < 10; ) {
     var randNum = Math.floor(Math.random() * 256) + 1;
     if (randYArray.includes(randNum)) {
@@ -217,13 +217,11 @@ function loadModels() {
       randCounter++;
     }
   }
-  console.log(randYArray);
 
   for (holder = 0; holder < array.length; holder += 3) {
     if (array[holder + 1] == 2000) {
       holdNum++;
       if (randYArray.includes(holdNum)) {
-        console.log(array[holder], array[holder + 1], array[holder + 2]);
         const pos = [
           array[holder],
           array[holder + 1] / 10,
@@ -246,17 +244,17 @@ function loadModels() {
     }
   }
 
-  loader.load('models/house/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.position.set(0, 200, 0);
-      }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
+  // loader.load('models/house/scene.gltf', function (gltf) {
+  //   gltf.scene.traverse((object) => {
+  //     if (object.isMesh) {
+  //       object.castShadow = true;
+  //       object.receiveShadow = true;
+  //       gltf.scene.position.set(0, 200, 0);
+  //     }
+  //   });
+  //   //add the 3dObject to the mesh
+  //   box_mesh.add(gltf.scene);
+  // });
   loader.load('models/rock/scene.gltf', function (gltf) {
     gltf.scene.traverse((object) => {
       if (object.isMesh) {
@@ -365,8 +363,10 @@ export function render() {
     camera.position.z
   );
 
-  // Render the reflection
-  cubeCamera.update(renderer, scene);
+  if (reflectionRenderTarget.width > 1) {
+    // Render the reflection
+    cubeCamera.update(renderer, scene);
+  }
 
   // Make hidden stuff visible again for main render
   water.visible = true;

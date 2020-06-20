@@ -35,7 +35,7 @@ export function createWater() {
     './textures/seawater_normals.jpg'
   );
 
-  const tileAmt = 2;
+  const tileAmt = 10;
 
   albedo.wrapS = THREE.RepeatWrapping;
   albedo.wrapT = THREE.RepeatWrapping;
@@ -57,8 +57,8 @@ export function createWater() {
     clearcoatRoughness: 0.01,
     transparent: true,
     roughness: 0.01,
-    transparency: 0.2,
-    reflectivity: 1.8
+    transparency: 0.23,
+    reflectivity: 1.7
   });
 
   const declarationsGLSL = 'uniform float time, frequency, amplitude;\n';
@@ -97,7 +97,7 @@ export function createWater() {
     waterObj.shader = shader;
   };
   const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(4000, 4000, 100, 100),
+    new THREE.PlaneBufferGeometry(10000, 10000, 200, 200),
     material
   );
 
