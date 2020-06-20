@@ -17,7 +17,7 @@ const cubeCamera = new THREE.CubeCamera(0.001, 15000, reflectionRenderTarget);
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
 var clock = new THREE.Clock();
-var mixer;
+var mixer, mixer2;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -258,10 +258,10 @@ function loadPhoenix() {
     //add the 3dObject to the mesh
     scene.add(phoenix.scene);
 
-    mixer = new THREE.AnimationMixer(phoenix.scene);
+    mixer2 = new THREE.AnimationMixer(phoenix.scene);
     // play animation
     phoenix.animations.forEach((clip) => {
-      mixer.clipAction(clip).play();
+      mixer2.clipAction(clip).play();
     });
   });
 }
@@ -286,6 +286,7 @@ export function update() {
   var delta = clock.getDelta();
 
   if (mixer) mixer.update(delta);
+  if (mixer2) mixer2.update(delta);
   // Update sun
   sun.position.set(...sunPos);
   directionalLight.position.set(...sunPos).normalize();
