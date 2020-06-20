@@ -38,7 +38,7 @@ let cameraTarget = { x: 0, y: 0, z: 0 };
 let lastRenderTime = performance.now();
 let deltaTime = 0.0; // The amount of time between frames (s)
 
-let sunPos = [2000, 2223, 300];
+let sunPos = [5000, 2223, 300];
 let hemiLightIntensity;
 let sunIntensity = 0.5;
 let particleSpeed = 0.01;
@@ -88,7 +88,7 @@ buildGUI((gui, folders) => {
     robot = !robot;
     for (let index in visibilityRobot) visibilityRobot[index].visible = !robot;
   });
-  folders.lighting.add(params, 'sunPosX', -3000, 3000).onChange((val) => {
+  folders.lighting.add(params, 'sunPosX', -5000, 5000).onChange((val) => {
     sunPos[0] = val;
   });
   folders.lighting.add(params, 'sunPosY', 0, 3000).onChange((val) => {
@@ -147,10 +147,7 @@ export function initialiseScene() {
   sun = new THREE.Mesh(sphereGeometry, sphereMaterial);
   scene.add(sun);
 
-  //cloud
-  createCloud();
-  //star
-  //createStar();
+
 
   // Directional light
   directionalLight = new THREE.DirectionalLight(0xffffff, sunIntensity);
@@ -348,22 +345,11 @@ export function update() {
   //Update day,night light and adding the cloud | star
   if (sun.position.y > 0) {
     hemiLight.intensity = sun.position.y * 0.0007;
-    //if (sun.position.y < 1000) {
-    // star = true;
-    //  createStar();
 
-    //}
   }
 
   //update cloud
-  cloudParticles.forEach((p) => {
-    p.rotation.z -= 0.002;
-  });
-  //update star
-  //starParticles.forEach(p => {
-  //  p.rotation.z -= 0.01;
-  //});
-
+  sky.position.y -= 0.0002;
   // Animate water
   updateWater(lastRenderTime);
 
