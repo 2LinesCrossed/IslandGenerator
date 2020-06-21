@@ -13,7 +13,7 @@ var freq = 40;
 //Terracing option to make the landscape into layers.
 var terrace = 1;
 //Flattens specific vertices to create a 'polygonal' look.
-var flatshader = 1;
+var flatshader = true;
 //How long each of the colour bands are.
 var colorInterval = 250.0;
 //Colour array for storing the 'bands' of colour
@@ -56,7 +56,7 @@ buildGUI((gui, folders) => {
     terrace = val;
     updateTerrain();
   });
-  folders.terrain.add(params, 'flatshader', 0, 1).onChange(function (val) {
+  folders.terrain.add(params, 'flatshader').onChange(function (val) {
     flatshader = val;
     updateTerrain();
   });
@@ -65,25 +65,25 @@ buildGUI((gui, folders) => {
 export function generateTerrain() {
   var geometry = new THREE.PlaneBufferGeometry(4000, 4000, 256, 256);
 
-  var fs = Math.round(flatshader) == 1 ? true : false;
-  var material = new THREE.MeshPhongMaterial({ flatShading: fs });
   const tileAmt = 10;
   const normals = THREE.ImageUtils.loadTexture('./textures/sand2.jpg');
   normals.wrapS = THREE.RepeatWrapping;
   normals.wrapT = THREE.RepeatWrapping;
   normals.repeat.set(tileAmt, tileAmt);
 
-  var material = new THREE.MeshPhysicalMaterial({
-    normalMap: normals,
-    normalScale: new THREE.Vector2(0.1, 0.01),
-    roughness: 0.7,
-    clearcoatNormalMap: normals,
-    clearcoatNormalScale: new THREE.Vector2(0.9, 1),
-    clearcoatRoughness: 0.56,
-    clearcoat: 0.4,
-    emissive: 0xffffff,
-    emissiveIntensity: 0.1
-  });
+  var material = flatshader
+    ? new THREE.MeshPhongMaterial({ flatShading: true })
+    : new THREE.MeshPhysicalMaterial({
+        normalMap: normals,
+        normalScale: new THREE.Vector2(0.1, 0.01),
+        roughness: 0.7,
+        clearcoatNormalMap: normals,
+        clearcoatNormalScale: new THREE.Vector2(0.9, 1),
+        clearcoatRoughness: 0.56,
+        clearcoat: 0.4,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.1
+      });
 
   material.onBeforeCompile = (shader) => {
     // Vertex Shader

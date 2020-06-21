@@ -35,7 +35,7 @@ export function createWater() {
     './textures/seawater_normals.jpg'
   );
 
-  const tileAmt = 10;
+  const tileAmt = 4;
 
   albedo.wrapS = THREE.RepeatWrapping;
   albedo.wrapT = THREE.RepeatWrapping;
@@ -97,7 +97,7 @@ export function createWater() {
     waterObj.shader = shader;
   };
   const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(10000, 10000, 200, 200),
+    new THREE.PlaneBufferGeometry(4000, 4000, 200, 200),
     material
   );
 
