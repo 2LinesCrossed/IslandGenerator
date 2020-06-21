@@ -1,7 +1,7 @@
 import * as THREE from './lib/three.js';
 import { buildGUI } from './gui.js';
 
-import { reflectionRenderTarget } from './scene.js';
+import { reflectionRenderTarget, globalParams } from './scene.js';
 
 let waterObj = {};
 
@@ -30,12 +30,13 @@ buildGUI((gui, folders) => {
 });
 
 export function createWater() {
+  const { scale } = globalParams;
   const albedo = THREE.ImageUtils.loadTexture('./textures/seawater.jpg');
   const normalMap = THREE.ImageUtils.loadTexture(
     './textures/seawater_normals.jpg'
   );
 
-  const tileAmt = 4;
+  const tileAmt = 4 * scale;
 
   albedo.wrapS = THREE.RepeatWrapping;
   albedo.wrapT = THREE.RepeatWrapping;
@@ -97,7 +98,12 @@ export function createWater() {
     waterObj.shader = shader;
   };
   const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(4000, 4000, 200, 200),
+    new THREE.PlaneBufferGeometry(
+      4000 * scale,
+      4000 * scale,
+      200 * scale,
+      200 * scale
+    ),
     material
   );
 

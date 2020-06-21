@@ -63,7 +63,13 @@ buildGUI((gui, folders) => {
 });
 
 export function generateTerrain() {
-  var geometry = new THREE.PlaneBufferGeometry(4000, 4000, 256, 256);
+  const { scale } = scene.globalParams;
+  var geometry = new THREE.PlaneBufferGeometry(
+    scale * 4000,
+    scale * 4000,
+    scale * 256,
+    scale * 256
+  );
 
   const tileAmt = 10;
   const normals = THREE.ImageUtils.loadTexture('./textures/sand2.jpg');

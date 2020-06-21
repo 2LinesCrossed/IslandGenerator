@@ -6,6 +6,8 @@ import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
 import { createParticleSystem } from './particles.js';
 
+export const globalParams = { scale: 1.0 };
+
 const defaultReflectionSize = 200;
 
 export const reflectionRenderTarget = new THREE.WebGLCubeRenderTarget(
@@ -32,7 +34,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.maxDistance = 12700.0;
 
-const water = createWater();
+let water = createWater();
 
 let cameraTarget = { x: 0, y: 0, z: 0 };
 let lastRenderTime = performance.now();
@@ -47,17 +49,18 @@ let sun, sky, hemiLight, directionalLight, terrain, particleSystem;
 let cloudParticles = [];
 let starParticles = [];
 let star = false;
-var visibilityDragon = [],
+let visibilityDragon = [],
   visibilityPhoenix = [],
   visibilityBalerion = [],
   visibilityRobot = [];
-var dragon = false,
+let dragon = false,
   phoenix = false,
   robot = true,
   balerion = false;
 
 buildGUI((gui, folders) => {
   const params = {
+    scale: globalParams.scale,
     dragon,
     phoenix,
     balerion,
@@ -69,23 +72,30 @@ buildGUI((gui, folders) => {
     particleSpeed,
     reflectionResolution: defaultReflectionSize
   };
+  folders.scene.add(params, 'scale', 0, 6).onChange((val) => {
+    globalParams.scale = val;
+    // Update water and terrain
+    setTerrain(generateTerrain());
+    setWater(createWater());
+    // Update mesh positions
+  });
   folders.creatures.add(params, 'dragon').onChange((val) => {
-    dragon = !dragon;
+    dragon = val;
     for (let index in visibilityDragon)
       visibilityDragon[index].visible = dragon;
   });
   folders.creatures.add(params, 'phoenix').onChange((val) => {
-    phoenix = !phoenix;
+    phoenix = val;
     for (let index in visibilityPhoenix)
       visibilityPhoenix[index].visible = phoenix;
   });
   folders.creatures.add(params, 'balerion').onChange((val) => {
-    balerion = !balerion;
+    balerion = val;
     for (let index in visibilityBalerion)
       visibilityBalerion[index].visible = balerion;
   });
   folders.creatures.add(params, 'robot').onChange((val) => {
-    robot = !robot;
+    robot = val;
     for (let index in visibilityRobot) visibilityRobot[index].visible = robot;
   });
   folders.lighting.add(params, 'sunPosX', -5000, 5000).onChange((val) => {
@@ -460,6 +470,12 @@ export function setTerrain(newTerrain) {
   scene.remove(terrain);
   terrain = newTerrain;
   scene.add(terrain);
+}
+
+export function setWater(newWater) {
+  scene.remove(water);
+  water = newWater;
+  scene.add(water);
 }
 
 export function render() {
