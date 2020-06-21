@@ -6,7 +6,7 @@ import { generateTerrain } from './terrain.js';
 import { createWater, updateWater } from './water.js';
 import { createParticleSystem } from './particles.js';
 
-export const globalParams = { scale: 1.0 };
+export const globalParams = { scale: 2.4 };
 
 const defaultReflectionSize = 200;
 
@@ -14,7 +14,7 @@ export const reflectionRenderTarget = new THREE.WebGLCubeRenderTarget(
   defaultReflectionSize
 );
 
-const cubeCamera = new THREE.CubeCamera(0.001, 2000, reflectionRenderTarget);
+const cubeCamera = new THREE.CubeCamera(0.001, 10000, reflectionRenderTarget);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
@@ -46,57 +46,63 @@ let sunIntensity = 0.5;
 let particleSpeed = 0.01;
 
 let sun, sky, hemiLight, directionalLight, terrain, particleSystem;
-let cloudParticles = [];
-let starParticles = [];
-let star = false;
-let visibilityDragon = [],
-  visibilityPhoenix = [],
-  visibilityBalerion = [],
-  visibilityRobot = [];
-let dragon = false,
-  phoenix = false,
-  robot = true,
-  balerion = false;
+let dragon, phoenix, balerion, robot;
+const meshes = {
+  dragon: {
+    visible: false,
+    position: [-1000, 700, 0]
+  },
+  phoenix: {
+    visible: false,
+    position: [1000, 700, 0]
+  },
+  balerion: {
+    visible: false,
+    position: [0, 700, -2000]
+  },
+  robot: {
+    visible: true,
+    position: [0, 2500, 2500]
+  }
+};
 
 buildGUI((gui, folders) => {
   const params = {
     scale: globalParams.scale,
-    dragon,
-    phoenix,
-    balerion,
-    robot,
     sunPosX: sunPos[0],
     sunPosY: sunPos[1],
     sunPosZ: sunPos[2],
     sunIntensity,
     particleSpeed,
-    reflectionResolution: defaultReflectionSize
+    reflectionResolution: defaultReflectionSize,
+    dragon: meshes.dragon.visible,
+    phoenix: meshes.phoenix.visible,
+    balerion: meshes.balerion.visible,
+    robot: meshes.robot.visible
   };
+
   folders.scene.add(params, 'scale', 0, 6).onChange((val) => {
     globalParams.scale = val;
-    // Update water and terrain
+
+    // Update water and terrain (mesh positions scale on update)
     setTerrain(generateTerrain());
     setWater(createWater());
-    // Update mesh positions
   });
   folders.creatures.add(params, 'dragon').onChange((val) => {
-    dragon = val;
-    for (let index in visibilityDragon)
-      visibilityDragon[index].visible = dragon;
+    meshes.dragon.visible = val;
+    dragon.visible = val;
   });
   folders.creatures.add(params, 'phoenix').onChange((val) => {
-    phoenix = val;
-    for (let index in visibilityPhoenix)
-      visibilityPhoenix[index].visible = phoenix;
+    meshes.phoenix.visible = val;
+    phoenix.visible = val;
   });
   folders.creatures.add(params, 'balerion').onChange((val) => {
-    balerion = val;
-    for (let index in visibilityBalerion)
-      visibilityBalerion[index].visible = balerion;
+    meshes.balerion.visible = val;
+    balerion.visible = val;
   });
   folders.creatures.add(params, 'robot').onChange((val) => {
-    robot = val;
-    for (let index in visibilityRobot) visibilityRobot[index].visible = robot;
+    meshes.robot.visible = val;
+    robot.visible = val;
   });
   folders.lighting.add(params, 'sunPosX', -5000, 5000).onChange((val) => {
     sunPos[0] = val;
@@ -179,13 +185,13 @@ export function initialiseScene() {
     //scale scene
     root.scale.set(45, 45, 45);
     //set position
-    root.position.set(-3000, 700, 0);
+    root.position.set(...meshes.dragon.position);
     //set rotation
     root.rotation.y += 1.65;
-    //push to array to change values from GUI
-    visibilityDragon.push(gltf.scene);
+
+    dragon = gltf.scene;
     //visibility
-    root.visible = dragon;
+    root.visible = meshes.dragon.visible;
     //Animation Mixer var
     mixer0 = new THREE.AnimationMixer(root);
     // play animation
@@ -202,13 +208,13 @@ export function initialiseScene() {
     // scale scene
     root.scale.set(3, 3, 3);
     // set position
-    root.position.set(3000, 700, 0);
+    root.position.set(...meshes.phoenix.position);
     // set rotation
     root.rotation.y += 2.7;
     // push to array to change in GUI
-    visibilityPhoenix.push(gltf.scene);
+    phoenix = gltf.scene;
     // visibility
-    root.visible = phoenix;
+    root.visible = meshes.phoenix.visible;
     //Animation Mixer var
     mixer1 = new THREE.AnimationMixer(root);
     // play animation
@@ -225,13 +231,13 @@ export function initialiseScene() {
     //scale scene
     root.scale.set(2, 2, 2);
     // set position
-    root.position.set(0, 700, -6000);
+    root.position.set(...meshes.balerion.position);
     // set rotation
     root.rotation.y += 1.65;
     // push to array to change in GUI
-    visibilityBalerion.push(gltf.scene);
+    balerion = gltf.scene;
     //visibility
-    root.visible = balerion;
+    root.visible = meshes.balerion.visible;
     //Animation Mixer var
     mixer2 = new THREE.AnimationMixer(root);
     // play animation
@@ -248,14 +254,14 @@ export function initialiseScene() {
     //scale scene
     root.scale.set(1, 1, 1);
     //set position
-    root.position.set(0, 2500, 3500);
+    root.position.set(...meshes.robot.position);
     //set rotation
     root.rotation.y += 4.8;
     root.rotation.x -= 0.5;
     //push to array to change in GUI
-    visibilityRobot.push(gltf.scene);
+    robot = gltf.scene;
     //visibility
-    root.visible = robot;
+    root.visible = meshes.robot.visible;
     //Animation mixer Var
     mixer3 = new THREE.AnimationMixer(root);
     // play animation
@@ -281,140 +287,6 @@ export function initialiseScene() {
   window.addEventListener('resize', onWindowResize);
 }
 
-//cloud
-function createCloud() {
-  const cloudGeometry = new THREE.PlaneBufferGeometry(500, 500);
-  const cloudMaterial = new THREE.MeshLambertMaterial({
-    map: new THREE.TextureLoader().load('./textures/try3.png'),
-    transparent: true
-  });
-  for (let p = 0; p < 8; p++) {
-    let cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    cloud.position.set(-1000 + p * 300, 1500, Math.random() * 1700 - 400);
-    cloud.rotation.x = 1.16;
-    cloud.rotation.y = -0.12;
-    cloud.rotation.z = Math.random() * 2 * Math.PI;
-    cloud.material.opacity = 0.75;
-    cloudParticles.push(cloud);
-    scene.add(cloud);
-  }
-}
-
-//star
-function createStar() {
-  const starGeometry = new THREE.PlaneBufferGeometry(50, 50);
-  const starMaterial = new THREE.MeshLambertMaterial({
-    map: new THREE.TextureLoader().load('./textures/try.png'),
-    transparent: true
-  });
-  if (star) {
-    for (let p = 0; p < 9; p++) {
-      let star = new THREE.Mesh(starGeometry, starMaterial);
-      star.position.set(Math.random() * 1700 - 400, 2000, -1000 + p * 300);
-      star.rotation.x = 1.16;
-      star.rotation.y = -0.12;
-      star.rotation.z = Math.random() * 2 * Math.PI;
-      star.material.opacity = 0.75;
-      starParticles.push(star);
-      scene.add(star);
-    }
-  }
-}
-
-// 3d Models
-function loadModels() {
-  //loader
-  var loader = new GLTFLoader();
-  // create material of geo
-  var material_cube = new THREE.MeshLambertMaterial();
-  // wireframe
-  material_cube.wireframe = false;
-  // create box geo
-  var geo_cube = new THREE.BoxGeometry(5, 0.1, 5);
-  // create box mesh
-  var box_mesh = new THREE.Mesh(geo_cube, material_cube);
-  box_mesh.castShadow = true;
-  box_mesh.receiveShadow = true;
-  // add geo to scene
-  scene.add(box_mesh);
-  // instantiate a 3dObject
-  var array = terrain.geometry.attributes.position.array;
-  var holder = 0;
-  var holdNum = 0;
-  var randYArray = [];
-  for (var randCounter = 0; randCounter < 10; ) {
-    var randNum = Math.floor(Math.random() * 256) + 1;
-    if (randYArray.includes(randNum)) {
-    } else {
-      randYArray.push(randNum);
-      randCounter++;
-    }
-  }
-  console.log(randYArray);
-
-  for (holder = 0; holder < array.length; holder += 3) {
-    if (array[holder + 1] == 2000) {
-      holdNum++;
-      if (randYArray.includes(holdNum)) {
-        console.log(array[holder], array[holder + 1], array[holder + 2]);
-        const pos = [
-          array[holder],
-          array[holder + 1] / 10,
-          array[holder + 2] * 10
-        ];
-        /*
-        loader.load('models/dragon/scene.gltf', function (gltf) {
-          gltf.scene.traverse((object) => {
-            if (object.isMesh) {
-              object.castShadow = true;
-              object.receiveShadow = true;
-              gltf.scene.scale.set(0.3, 0.3, 0.3);
-              gltf.scene.position.set(pos[2], pos[1], pos[0]);
-            }
-          });
-          //add the 3dObject to the mesh
-          box_mesh.add(gltf.scene);
-        });*/
-      }
-    }
-  }
-
-  /*loader.load('models/house/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.position.set(0, 200, 0);
-      }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
-  loader.load('models/rock/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.scale.set(3.0, 3.0, 3.0);
-        gltf.scene.position.set(100, 200, 0);
-      }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });
-  loader.load('models/tree/scene.gltf', function (gltf) {
-    gltf.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-        gltf.scene.scale.set(0.1, 0.1, 0.1);
-        gltf.scene.position.set(200, 200, 0);
-      }
-    });
-    //add the 3dObject to the mesh
-    box_mesh.add(gltf.scene);
-  });*/
-}
 function onWindowResize() {
   //get the new sizes
   const width = window.innerWidth;
@@ -456,6 +328,15 @@ export function update() {
 
   // Animate particles
   particleSystem.rotation.y += particleSpeed * deltaTime;
+
+  // Update mesh positions (if loaded)
+  const posScale = Math.max(Math.min(globalParams.scale, 3.0), 2.4);
+  dragon &&
+    dragon.position.set(...meshes.dragon.position.map((v) => v * posScale));
+  phoenix &&
+    phoenix.position.set(...meshes.phoenix.position.map((v) => v * posScale));
+  balerion &&
+    balerion.position.set(...meshes.balerion.position.map((v) => v * posScale));
 
   // Finally render
   render();
