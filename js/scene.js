@@ -72,21 +72,21 @@ buildGUI((gui, folders) => {
   folders.creatures.add(params, 'dragon').onChange((val) => {
     dragon = !dragon;
     for (let index in visibilityDragon)
-      visibilityDragon[index].visible = !dragon;
+      visibilityDragon[index].visible = dragon;
   });
   folders.creatures.add(params, 'phoenix').onChange((val) => {
     phoenix = !phoenix;
     for (let index in visibilityPhoenix)
-      visibilityPhoenix[index].visible = !phoenix;
+      visibilityPhoenix[index].visible = phoenix;
   });
   folders.creatures.add(params, 'balerion').onChange((val) => {
     balerion = !balerion;
     for (let index in visibilityBalerion)
-      visibilityBalerion[index].visible = !balerion;
+      visibilityBalerion[index].visible = balerion;
   });
   folders.creatures.add(params, 'robot').onChange((val) => {
     robot = !robot;
-    for (let index in visibilityRobot) visibilityRobot[index].visible = !robot;
+    for (let index in visibilityRobot) visibilityRobot[index].visible = robot;
   });
   folders.lighting.add(params, 'sunPosX', -5000, 5000).onChange((val) => {
     sunPos[0] = val;

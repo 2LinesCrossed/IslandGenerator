@@ -49,6 +49,7 @@ export function initialiseGui() {
   // Create folders
   folders = {
     rendering: gui.addFolder('Rendering'),
+    scene: gui.addFolder('Scene'),
     terrain: gui.addFolder('Terrain'),
     water: gui.addFolder('Water'),
     lighting: gui.addFolder('Lighting'),
