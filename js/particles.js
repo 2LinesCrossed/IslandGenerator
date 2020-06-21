@@ -2,7 +2,7 @@ import * as THREE from './lib/three.js';
 
 // Particles are rendered as a single mesh with a vertex for each particle.
 export function createParticleSystem() {
-  const count = 12000;
+  const count = 9000;
   const size = 10000;
   const particles = new THREE.Geometry();
   const material = new THREE.PointsMaterial({

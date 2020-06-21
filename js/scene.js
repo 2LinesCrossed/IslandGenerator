@@ -42,7 +42,7 @@ let deltaTime = 0.0; // The amount of time between frames (s)
 let sunPos = [5000, 2223, 300];
 let hemiLightIntensity;
 let sunIntensity = 0.5;
-let particleSpeed = 0.01;
+let particleSpeed = 0.005;
 
 let sun, sky, hemiLight, directionalLight, terrain, particleSystem;
 let dragon, phoenix, balerion, robot;
@@ -111,7 +111,7 @@ buildGUI((gui, folders) => {
   folders.lighting.add(params, 'sunIntensity', 0, 5).onChange((val) => {
     sunIntensity = val;
   });
-  folders.particles.add(params, 'particleSpeed', 0, 5).onChange((val) => {
+  folders.particles.add(params, 'particleSpeed', 0, 0.1).onChange((val) => {
     particleSpeed = val;
   });
   folders.rendering
