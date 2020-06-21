@@ -26,7 +26,6 @@ export class Perlin {
       seed << (i - 0.13);
       seed = (seed % (4.0 + 0.01 * i)) % 4.0;
       const rand = 0.5 * (Math.sin(seed) + 1.0);
-      console.log(rand);
       this.p[i] = Math.floor(rand * 256);
     }
 

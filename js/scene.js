@@ -18,8 +18,7 @@ const cubeCamera = new THREE.CubeCamera(0.001, 10000, reflectionRenderTarget);
 
 const initialWidth = window.innerWidth;
 const initialHeight = window.innerHeight;
-var clock = new THREE.Clock();
-var mixer0, mixer1, mixer2, mixer3;
+let mixer0, mixer1, mixer2, mixer3;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -184,7 +183,6 @@ export function initialiseScene() {
     root.position.set(...meshes.dragon.position);
     //set rotation
     root.rotation.y += 1.65;
-
     dragon = gltf.scene;
     //visibility
     root.visible = meshes.dragon.visible;
@@ -207,7 +205,6 @@ export function initialiseScene() {
     root.position.set(...meshes.phoenix.position);
     // set rotation
     root.rotation.y += 2.7;
-    // push to array to change in GUI
     phoenix = gltf.scene;
     // visibility
     root.visible = meshes.phoenix.visible;
@@ -230,7 +227,6 @@ export function initialiseScene() {
     root.position.set(...meshes.balerion.position);
     // set rotation
     root.rotation.y += 1.65;
-    // push to array to change in GUI
     balerion = gltf.scene;
     //visibility
     root.visible = meshes.balerion.visible;
@@ -254,7 +250,6 @@ export function initialiseScene() {
     //set rotation
     root.rotation.y += 4.8;
     root.rotation.x -= 0.5;
-    //push to array to change in GUI
     robot = gltf.scene;
     //visibility
     root.visible = meshes.robot.visible;
@@ -300,13 +295,12 @@ function onWindowResize() {
 }
 
 export function update() {
-  //clock for animation
-  var delta = clock.getDelta();
   //animation clip updates
-  if (mixer0) mixer0.update(delta);
-  if (mixer1) mixer1.update(delta);
-  if (mixer2) mixer2.update(delta);
-  if (mixer3) mixer3.update(delta);
+  if (mixer0) mixer0.update(deltaTime);
+  if (mixer1) mixer1.update(deltaTime);
+  if (mixer2) mixer2.update(deltaTime);
+  if (mixer3) mixer3.update(deltaTime);
+
   // Update sun
   sun.position.set(...sunPos);
   directionalLight.position.set(...sunPos).normalize();

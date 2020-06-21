@@ -172,8 +172,6 @@ export function generateTerrain() {
   //Change the peak value for different sizes.
   var perlin = new Perlin(myseed);
   var vertices = terrain.geometry.attributes.position.array;
-  console.log(freq);
-
   //Algorithm for creating proper mountainous landscapes
   for (var i = 0; i <= vertices.length; i += 3) {
     let x = vertices[i];

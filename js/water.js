@@ -67,7 +67,7 @@ material.onBeforeCompile = (shader) => {
 };
 
 buildGUI((gui, folders) => {
-  var params = {
+  const params = {
     frequency,
     amplitude,
     waterSpeed
