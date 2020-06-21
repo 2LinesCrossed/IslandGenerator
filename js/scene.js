@@ -90,19 +90,15 @@ buildGUI((gui, folders) => {
   });
   folders.creatures.add(params, 'dragon').onChange((val) => {
     meshes.dragon.visible = val;
-    dragon.visible = val;
   });
   folders.creatures.add(params, 'phoenix').onChange((val) => {
     meshes.phoenix.visible = val;
-    phoenix.visible = val;
   });
   folders.creatures.add(params, 'balerion').onChange((val) => {
     meshes.balerion.visible = val;
-    balerion.visible = val;
   });
   folders.creatures.add(params, 'robot').onChange((val) => {
     meshes.robot.visible = val;
-    robot.visible = val;
   });
   folders.lighting.add(params, 'sunPosX', -5000, 5000).onChange((val) => {
     sunPos[0] = val;
@@ -110,7 +106,7 @@ buildGUI((gui, folders) => {
   folders.lighting.add(params, 'sunPosY', 0, 3000).onChange((val) => {
     sunPos[1] = val;
   });
-  folders.lighting.add(params, 'sunPosZ', -3000, 3000).onChange((val) => {
+  folders.lighting.add(params, 'sunPosZ', -5000, 5000).onChange((val) => {
     sunPos[2] = val;
   });
   folders.lighting.add(params, 'sunIntensity', 0, 5).onChange((val) => {
@@ -329,14 +325,24 @@ export function update() {
   // Animate particles
   particleSystem.rotation.y += particleSpeed * deltaTime;
 
-  // Update mesh positions (if loaded)
+  // Update mesh positions and visibility (if loaded)
   const posScale = Math.max(Math.min(globalParams.scale, 3.0), 2.4);
-  dragon &&
+
+  if (dragon) {
     dragon.position.set(...meshes.dragon.position.map((v) => v * posScale));
-  phoenix &&
+    dragon.visible = meshes.dragon.visible;
+  }
+  if (phoenix) {
     phoenix.position.set(...meshes.phoenix.position.map((v) => v * posScale));
-  balerion &&
+    phoenix.visible = meshes.phoenix.visible;
+  }
+  if (balerion) {
     balerion.position.set(...meshes.balerion.position.map((v) => v * posScale));
+    balerion.visible = meshes.balerion.visible;
+  }
+  if (robot) {
+    robot.visible = meshes.robot.visible;
+  }
 
   // Finally render
   render();
