@@ -177,7 +177,7 @@ export function initialiseScene() {
   const gltfLoader = new GLTFLoader();
   //Dragon by RedCoreTimber Sketchfab
   //load model Asynchronus
-  gltfLoader.load('/models/dragon/scene.gltf', (gltf) => {
+  gltfLoader.load('./models/dragon/scene.gltf', (gltf) => {
     //set const to avoid calling gltf.scene multiple times
     const root = gltf.scene;
     //add to scene
@@ -201,7 +201,7 @@ export function initialiseScene() {
   });
   //Phoenix by Sketchfab
   //load model Asynchronus
-  gltfLoader.load('/models/phoenix/scene.gltf', (gltf) => {
+  gltfLoader.load('./models/phoenix/scene.gltf', (gltf) => {
     const root = gltf.scene;
     // add to scene
     scene.add(root);
@@ -224,7 +224,7 @@ export function initialiseScene() {
   });
   //Balerion from Game of Thrones by Anthony Yanez Sketchfab
   //load model Asynchronus
-  gltfLoader.load('/models/balerion/scene.gltf', (gltf) => {
+  gltfLoader.load('./models/balerion/scene.gltf', (gltf) => {
     const root = gltf.scene;
     //add to scene
     scene.add(root);
@@ -247,7 +247,7 @@ export function initialiseScene() {
   });
   //Robot by Wakarma sketchfab
   //load model Asynchronus
-  gltfLoader.load('/models/robot/scene.gltf', (gltf) => {
+  gltfLoader.load('./models/robot/scene.gltf', (gltf) => {
     const root = gltf.scene;
     //add to scene
     scene.add(root);
